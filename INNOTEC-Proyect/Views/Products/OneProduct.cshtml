@@ -1,0 +1,197 @@
+﻿@model HomeViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "One Product";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/productos.css" asp-append-version="true" />
+}
+
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                @foreach (var dept in Model.MenuItems)
+                {
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink@dept.IdDepartamento" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            @dept.Nombre
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink@dept.IdDepartamento">
+                            @if (dept.Productos.Any())
+                            {
+                                <li>
+                                    <a class="dropdown-item" href="#">Productos del Departamento</a>
+                                    <ul class="dropdown-menu">
+                                        @foreach (var prod in dept.Productos)
+                                        {
+                                            <li><a class="dropdown-item" href="@Url.Action("OneProduct", "Home", new { id = prod.IdProductos })">@prod.Nombre</a></li>
+                                        }
+                                    </ul>
+                                </li>
+                            }
+                            @foreach (var cat in dept.Categoria)
+                            {
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">@cat.Nombre</a>
+                                    <ul class="dropdown-menu">
+                                        @if (cat.Productos.Any())
+                                        {
+                                            <li>
+                                                <a class="dropdown-item" href="#">Productos de la Categoría</a>
+                                                <ul class="dropdown-menu">
+                                                    @foreach (var prod in cat.Productos)
+                                                    {
+                                                        <li><a class="dropdown-item" href="@Url.Action("OneProduct", "Home", new { id = prod.IdProductos })">@prod.Nombre</a></li>
+                                                    }
+                                                </ul>
+                                            </li>
+                                        }
+                                        @foreach (var sub in cat.Subcategoria)
+                                        {
+                                            <li class="dropdown-submenu">
+                                                <a class="dropdown-item dropdown-toggle" href="#">@sub.Nombre</a>
+                                                <ul class="dropdown-menu">
+                                                    @foreach (var prod in sub.Productos)
+                                                    {
+                                                        <li><a class="dropdown-item" href="@Url.Action("OneProduct", "Home", new { id = prod.IdProductos })">@prod.Nombre</a></li>
+                                                    }
+                                                </ul>
+                                            </li>
+                                        }
+                                    </ul>
+                                </li>
+                            }
+                        </ul>
+                    </li>
+                }
+            </ul>
+            <div class="search-container">
+                <form class="d-flex" method="get" asp-controller="Home" asp-action="GetByName">
+                    <input class="form-control me-2 search-input" type="search" name="search" placeholder="Search" aria-label="Search" autocomplete="off">
+                </form>
+                <div class="search-results" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="wrapper">
+    <div class="product-img">
+        @if (Model.Producto.ImagenDelProducto != null)
+        {
+            <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.Producto.ImagenDelProducto)" alt="@Model.Producto.Nombre" height="420" width="327">
+        }
+        else
+        {
+            <img src="~/Images/no-image-available.png" alt="No image available" height="420" width="327">
+        }
+    </div>
+    <div class="product-info">
+        <div class="product-text">
+            <h1>@Model.Producto.Nombre</h1>
+          
+            <p>@Model.Producto.DescripcionDelProducto</p>
+        </div>
+        <div class="product-price-btn">
+            <p><span>@Model.Producto.Precio</span>$</p>
+            <a href="@Url.Action("AddToCart", "Home", new { id = Model.Producto.IdProductos })">
+                <button type="button">buy now</button>
+            </a>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var dropdownElements = document.querySelectorAll('.dropdown-menu .dropdown-toggle');
+
+        dropdownElements.forEach(function (dropdownToggle) {
+            dropdownToggle.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                var submenu = this.nextElementSibling;
+                var parentLi = this.closest('li');
+
+                if (!submenu.classList.contains('show')) {
+                    var openMenus = this.closest('.dropdown-menu').querySelectorAll('.dropdown-menu.show');
+                    openMenus.forEach(function (openMenu) {
+                        openMenu.classList.remove('show');
+                        openMenu.closest('li').classList.remove('show');
+                    });
+
+                    submenu.classList.add('show');
+                    parentLi.classList.add('show');
+                } else {
+                    submenu.classList.remove('show');
+                    parentLi.classList.remove('show');
+                }
+            });
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!e.target.matches('.dropdown-toggle')) {
+                var openMenus = document.querySelectorAll('.dropdown-menu.show');
+                openMenus.forEach(function (openMenu) {
+                    openMenu.classList.remove('show');
+                    if (openMenu.closest('li')) {
+                        openMenu.closest('li').classList.remove('show');
+                    }
+                });
+            }
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var searchInput = document.querySelector('.search-input');
+        var resultsContainer = document.querySelector('.search-results');
+
+        searchInput.addEventListener('input', function () {
+            var searchText = this.value.trim();
+
+            if (searchText.length > 2) { // Asegura al menos 3 caracteres para buscar
+                fetch(`/GetByName?search=${encodeURIComponent(searchText)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        resultsContainer.innerHTML = ''; // Limpia resultados anteriores
+                        if (data.length > 0) {
+                            data.forEach(item => {
+                                let div = document.createElement('div');
+                                div.textContent = item.nombre; // Asume que el objeto tiene una propiedad 'nombre'
+                                div.className = 'result-item';
+                                resultsContainer.appendChild(div);
+
+                                div.addEventListener('click', () => {
+                                    window.location.href = `/OneProduct/${item.idProductos}`; // Redirige al usuario a la página del producto
+                                });
+                            });
+                        } else {
+                            let div = document.createElement('div');
+                            div.textContent = 'No results found';
+                            div.className = 'result-item';
+                            resultsContainer.appendChild(div);
+                        }
+                        resultsContainer.style.display = 'block'; // Muestra los resultados
+                    });
+            } else {
+                resultsContainer.style.display = 'none'; // Oculta los resultados si no hay suficientes caracteres
+            }
+        });
+
+        // Cierra el desplegable al hacer clic fuera de él
+        document.addEventListener('click', function (e) {
+            if (!searchInput.contains(e.target)) {
+                resultsContainer.style.display = 'none';
+            }
+        });
+    });
+</script>

@@ -1,0 +1,75 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+@media (max-width: 768px) { 
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 10%; 
+    }
+
+    .carousel-item img {
+        height: 300px; 
+    }
+}
+
+.dropdown-submenu {
+    position: relative;
+}
+
+    .dropdown-submenu .dropdown-menu {
+        top: 0;
+        left: 100%;
+        margin-top: -1px;
+    }
+
+    /*************************************/
+
+
+.search-container {
+    position: relative;
+    width: 100%; /* O ajusta según el ancho deseado */
+}
+
+.search-results {
+    position: absolute;
+    top: 100%; /* Se posiciona justo debajo del input */
+    width: 100%;
+    background: white;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+    .search-results .result-item {
+        padding: 10px;
+        cursor: pointer;
+        border-bottom: 1px solid #eee;
+    }
+
+        .search-results .result-item:last-child {
+            border-bottom: none;
+        }
+
+
+/*************************************/
+
