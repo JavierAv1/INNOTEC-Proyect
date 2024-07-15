@@ -73,3 +73,52 @@ body {
 
 /*************************************/
 
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .footer-content .column {
+            flex: 1;
+            text-align: center;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding: 1rem 0;
+            border-top: 1px solid #ddd;
+        }
+
+        .dropdown-menu {
+            width: 100%;
+        }
+
+        .dropdown-menu .row {
+            margin: 0;
+        }
+
+        .dropdown-menu .col-md-4 {
+            padding: 10px;
+        }
+
+        .dropdown-menu h6 {
+            font-weight: bold;
+        }
+
+        .dropdown-menu p, .dropdown-menu a {
+            margin: 0;
+            color: #000;
+        }
+
+        .social-links a {
+            color: #000;
+            margin: 0 10px;
+        }
+
+        .social-links a:hover {
+            color: #007bff;
+        }
+
+/*************************************/

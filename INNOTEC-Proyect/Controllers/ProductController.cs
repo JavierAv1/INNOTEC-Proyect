@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ML;
 using Newtonsoft.Json;
+using INNOTEC_Proyect.Clases;
 
 namespace INNOTEC_Proyect.Controllers
 {
@@ -77,6 +78,5 @@ namespace INNOTEC_Proyect.Controllers
 
             return View("~/Views/Products/Products.cshtml", viewModel);  
         }
-
     }
 }

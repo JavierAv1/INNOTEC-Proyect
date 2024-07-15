@@ -31,10 +31,57 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Product" asp-action="Products">Productos</a>
                         </li>
+                        @if (User.IsInRole("1"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Capturista" asp-action="Captura">Gestión de Usuarios</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Capturista" asp-action="Captura">Gestión de productos</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Capturista" asp-action="Captura">Gestión de Envíos</a>
+                            </li>
+                        }
+                        else if (User.IsInRole("2"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Capturista" asp-action="Captura">Gestión de productos</a>
+                            </li>
+                        }
+                        else if (User.IsInRole("4"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Capturista" asp-action="Captura">Gestión de productos</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Capturista" asp-action="Captura">Gestión de Envíos</a>
+                            </li>
+                        }
+
                     </ul>
                     <div class="navbar-nav ms-auto d-flex align-items-center">
                         @if (User.Identity.IsAuthenticated)
                         {
+                            <li class="nav-item">
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    var userIdClaim = User.FindFirst("UserId");
+                                    if (userIdClaim != null)
+                                    {
+                                        int idUsuario = int.Parse(userIdClaim.Value);
+                                    <li class="nav-item">
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="Carrito" asp-action="GetByUserId" asp-route-idUsuario="@idUsuario">Carrito de compras</a>
+                                    </li>
+                                    }
+                                }
+                                else
+                                {
+                                <a class="nav-link text-dark" href="@Url.Action("Login", "Login")">
+                                    <img src="~/images/usuario.png" alt="Profile Picture" class="rounded-circle" height="40">
+                                </a>
+                                }
+                            </li>
                             <div class="dropdown">
                                 <a class="nav-link text-dark dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <img src="~/images/usuario.png" alt="Profile Picture" class="rounded-circle" height="40">
@@ -68,10 +115,46 @@
     </div>
 
     <footer class="border-top footer text-muted">
-        <div class="container">
+        <div class="footer-bottom">
             &copy; 2024 - INNOTEC_Proyect - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
+        <div class="container">
+            <div class="footer-content">
+                <div class="column">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="footerDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        Más información
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="footerDropdown">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <h6>Mensaje de Privacidad</h6>
+                                <p>&copy; 2024 - INNOTEC_Proyect - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></p>
+                            </div>
+                            <div class="col-md-4">
+                                <h6>Visítanos</h6>
+                                <p><a href="https://www.google.com/maps/place/[Tu+Dirección+Aquí]" target="_blank">Ubicación en Google Maps</a></p>
+                            </div>
+                            <div class="col-md-4">
+                                <h6>Nuestras Redes</h6>
+                                <div class="social-links">
+                                    <a href="https://www.facebook.com" target="_blank">
+                                        <img src="~/images/facebook.png" alt="Facebook" class="social-icon">
+                                    </a>
+                                    <a href="https://www.twitter.com" target="_blank">
+                                        <img src="~/images/twitter.png" alt="Twitter" class="social-icon">
+                                    </a>
+                                    <a href="https://www.instagram.com" target="_blank">
+                                        <img src="~/images/instagram.png" alt="Instagram" class="social-icon">
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </footer>
+
     <!-- jQuery, necessary for Bootstrap's JavaScript plugins -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <!-- Bootstrap Bundle JS includes Popper -->

@@ -59,7 +59,10 @@ namespace INNOTEC_Proyect.Controllers
                             {
                                 new Claim(ClaimTypes.Name, usuario.UserName),
                                 new Claim("FullName", usuario.Nombre),
-                                new Claim(ClaimTypes.Role, usuario.TipoUsuarioIdTipousuario.ToString())
+                                new Claim(ClaimTypes.Role, usuario.TipoUsuarioIdTipousuario.ToString()),
+                                new Claim("UserId", usuario.UsuarioId.ToString()),
+                                new Claim("TipoUsuarioId", usuario.TipoUsuarioIdTipousuario.ToString())
+
                             };
 
                             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

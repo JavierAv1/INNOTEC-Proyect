@@ -17,7 +17,7 @@ public partial class Compra
 
     public int? Cantidad { get; set; }
 
-    public virtual ICollection<Envio> Envios { get; set; } = new List<Envio>();
+    public virtual ICollection<Envio>? Envios { get; set; } = new List<Envio>();
 
     public virtual Producto? IdproductoNavigation { get; set; }
 

@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="~/css/productos.css" asp-append-version="true" />
 }
 
-
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -96,19 +95,16 @@
     <div class="product-info">
         <div class="product-text">
             <h1>@Model.Producto.Nombre</h1>
-          
+
             <p>@Model.Producto.DescripcionDelProducto</p>
         </div>
         <div class="product-price-btn">
             <p><span>@Model.Producto.Precio</span>$</p>
-            <a href="@Url.Action("AddToCart", "Home", new { id = Model.Producto.IdProductos })">
-                <button type="button">buy now</button>
-            </a>
+            <button id="addCarritoBtn" class="btn btn-primary" onclick="addCarrito(@Model.Producto.IdProductos)">Añadir al carrito</button>
+            <div id="statusMessage" class="alert d-none mt-2"></div>
         </div>
     </div>
 </div>
-
-
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -194,4 +190,29 @@
             }
         });
     });
+
+    function addCarrito(idProducto) {
+        var button = $('#addCarritoBtn');
+        var statusMessage = $('#statusMessage');
+        button.prop('disabled', true).html('<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span> Cargando...');
+
+        $.post('/Carrito/AddCarrito', { idProducto: idProducto })
+            .done(function (response) {
+                statusMessage.removeClass('d-none alert-danger').addClass('alert-success').text(response.message);
+                button.html('Producto agregado').removeClass('btn-primary').addClass('btn-success');
+
+                setTimeout(function () {
+                    statusMessage.addClass('d-none');
+                    button.prop('disabled', false).html('Añadir al carrito').removeClass('btn-success').addClass('btn-primary');
+                }, 5000);
+            })
+            .fail(function (error) {
+                statusMessage.removeClass('d-none alert-success').addClass('alert-danger').text('Error al agregar producto: ' + error.responseJSON.message);
+                button.prop('disabled', false).html('Añadir al carrito');
+
+                setTimeout(function () {
+                    statusMessage.addClass('d-none');
+                }, 5000);
+            });
+    }
 </script>
