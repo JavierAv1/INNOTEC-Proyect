@@ -108,14 +108,12 @@
         document.getElementById('extraFields').style.display = isLogin ? 'block' : 'none';
 
         if (isLogin) {
-            
             document.getElementById('email').required = true;
             document.getElementById('firstName').required = true;
             document.getElementById('lastName').required = true;
             document.getElementById('dob').required = true;
             document.getElementById('gender').required = true;
         } else {
-          
             document.getElementById('email').required = false;
             document.getElementById('firstName').required = false;
             document.getElementById('lastName').required = false;
@@ -124,5 +122,12 @@
         }
 
         document.getElementById('loginForm').action = isLogin ? '/Login/Register' : '/Login/Login';
+    });
+
+    document.getElementById('loginForm').addEventListener('keypress', function (event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            document.getElementById('submitButton').click();
+        }
     });
 </script>

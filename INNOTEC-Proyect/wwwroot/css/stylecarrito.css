@@ -1,0 +1,33 @@
+﻿.product-image {
+    width: 100%;
+    height: auto;
+}
+
+    .product-image:hover {
+        transform: scale(1.1);
+        transition: all 0.3s ease;
+    }
+
+.border-rounded {
+    border-radius: 15px;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-outline-primary {
+    color: #007bff;
+    border-color: #007bff;
+}
+
+    .btn-primary:hover, .btn-outline-primary:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }

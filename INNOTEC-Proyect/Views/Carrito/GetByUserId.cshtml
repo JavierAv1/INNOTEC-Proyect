@@ -1,51 +1,132 @@
-﻿@model List<ML.Compra>
+﻿@using System.Security.Claims
+@model List<ML.Compra>
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Lista de Compras";
 }
+@section Styles {
+    <link rel="stylesheet" href="~/css/stylecarrito.css" asp-append-version="true" />
+}
 
-<h2>Lista de Compras</h2>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Nombre del Producto</th>
-            <th>Descripción</th>
-            <th>Cantidad</th>
-            <th>Fecha de Compra</th>
-            <th>Fecha de Vencimiento</th>
-            <th>Precio</th>
-            <th>Imagen</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.IdproductoNavigation.Nombre</td>
-                <td>@item.IdproductoNavigation.DescripcionDelProducto</td>
-                <td>@item.Cantidad</td>
-                <td>@item.FechaDeCompra?.ToString("yyyy-MM-dd")</td>
-                <td>@item.FechaVencimiento?.ToString("yyyy-MM-dd")</td>
-                <td>@item.IdproductoNavigation.Precio</td>
-                <td>
-                    @if (item.IdproductoNavigation.ImagenDelProducto != null)
-                    {
-                        <img src="data:image/jpeg;base64,@Convert.ToBase64String(item.IdproductoNavigation.ImagenDelProducto)" alt="Product" class="img-responsive" style="width: 100px; height: 100px;" />
-                    }
-                    else
-                    {
-                        <img src="~/Images//no-image-available.png" alt="No image available" class="img-responsive" style="width: 100px; height: 100px;" />
-                    }
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8">
+            @foreach (var item in Model)
+            {
+                <div class="row mb-3 p-2 bg-white border rounded">
+                    <div class="col-md-2 mt-1">
+                        @if (item.IdproductoNavigation?.ImagenDelProducto != null)
+                        {
+                            <img class="img-fluid img-responsive rounded product-image" src="data:image/jpeg;base64,@Convert.ToBase64String(item.IdproductoNavigation?.ImagenDelProducto)" alt="@item.IdproductoNavigation?.Nombre">
+                        }
+                        else
+                        {
+                            <img src="~/Images/no-image-available.png" alt="No image available" class="img-responsive" />
+                        }
+                    </div>
+                    <div class="col-md-6 mt-1">
+                        <h5>@item.IdproductoNavigation?.Nombre</h5>
+                        <div class="d-flex flex-row">
+                            <div class="ratings mr-2"><i class="fa fa-star"></i></div><span>@item.FechaDeCompra?.ToString("yyyy-MM-dd")</span>
+                        </div>
+                        <p class="text-justify text-truncate para mb-0">@item.IdproductoNavigation?.DescripcionDelProducto</p>
+                    </div>
+                    <div class="col-md-4 align-items-center align-content-center">
+                        <div class="d-flex flex-row align-items-center">
+                            <h4 class="mr-1">$@item.IdproductoNavigation?.Precio</h4>
+                        </div>
+                        <div class="d-flex flex-column mt-4">
+                            <input type="hidden" class="form-control idusuario" value="@User.FindFirstValue("UserId")" />
+                            <input type="hidden" class="form-control idproducto" value="@item.Idproducto" />
+                            <input type="hidden" class="form-control idcompra" value="@item.IdCompra" />
+                            <input type="number" class="form-control mb-2 cantidad" value="@item.Cantidad" data-id="@item.IdCompra" min="1" />
+                            <button class="btn btn-outline-danger btn-sm eliminar-btn" type="button" data-id="@item.IdCompra">Eliminar</button>
+                            <button class="btn btn-outline-primary btn-sm mt-2 comprar-btn" type="button" data-id="@item.IdCompra">Comprar ahora</button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Resumen de compra</h5>
+                    <p class="card-text">Total productos: @Model.Count</p>
+                    <p class="card-text">Envío: Gratis</p>
+                    <p class="card-text">Total: $@Model.Sum(item => item.IdproductoNavigation?.Precio * item.Cantidad)</p>
+                    <button class="btn btn-primary btn-block">Continuar compra</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-@if (User.IsInRole("1") || User.IsInRole("4"))
-{
-    <!-- Opciones para Administrador o Gerente, tal vez botones de acción como editar o eliminar -->
-    <button onclick="location.href='@Url.Action("Edit", "Compra")'">Editar</button>
-    <button onclick="location.href='@Url.Action("Delete", "Compra")'">Eliminar</button>
+@section Scripts {
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.cantidad').on('change', function () {
+                var id = $(this).data('id');
+                var cantidad = $(this).val();
+                var idusuario = $(this).closest('.d-flex').find('.idusuario').val();
+                var idproducto = $(this).closest('.d-flex').find('.idproducto').val();
+                var idcompra = $(this).closest('.d-flex').find('.idcompra').val();
+
+                var compra = {
+                    IdCompra: parseInt(idcompra),
+                    Cantidad: parseInt(cantidad),
+                    Idusuario: parseInt(idusuario),
+                    Idproducto: parseInt(idproducto),
+                    FechaDeCompra: "2024-07-17", 
+                    FechaVencimiento: "2024-08-16" 
+                };
+
+                $.ajax({
+                    url: '@Url.Action("Update", "Carrito")',
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify(compra),
+                    success: function (response) {
+                        if (response.success) {
+                            location.reload(); 
+                        } else {
+                            alert('Error al actualizar la cantidad: ' + response.errorMessage);
+                        }
+                    },
+                    error: function (xhr) {
+                        var errorMessage = xhr.responseJSON ? xhr.responseJSON.message : 'Error desconocido';
+                        alert('Error al actualizar la cantidad: ' + errorMessage);
+                    }
+                });
+            });
+
+            $('.eliminar-btn').on('click', function () {
+                var id = $(this).data('id');
+
+                $.ajax({
+                    url: '@Url.Action("Delete", "Carrito")',
+                    type: 'DELETE',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ id: id }),
+                    success: function (response) {
+                        if (response.success) {
+                            location.reload(); 
+                        } else {
+                            alert('Error al eliminar el producto: ' + response.errorMessage);
+                        }
+                    },
+                    error: function (xhr) {
+                        var errorMessage = xhr.responseJSON ? xhr.responseJSON.message : 'Error desconocido';
+                        alert('Error al eliminar el producto: ' + errorMessage);
+                    }
+                });
+            });
+
+            $('.comprar-btn').on('click', function () {
+                var id = $(this).data('id');
+                window.location.href = '@Url.Action("Comprar", "Carrito")?id=' + id;
+            });
+        });
+    </script>
 }

@@ -4,38 +4,78 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Lista de Compras";
 }
+@section Styles {
+    <link rel="stylesheet" href="~/css/stylecarrito.css" asp-append-version="true" />
+}
 
-<h2>Lista de Compras</h2>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Nombre del Producto</th>
-            <th>Descripción</th>
-            <th>Cantidad</th>
-            <th>Fecha de Compra</th>
-            <th>Fecha de Vencimiento</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.IdproductoNavigation?.Nombre</td>
-                <td>@item.IdproductoNavigation?.DescripcionDelProducto</td>
-                <td>@item.Cantidad</td>
-                <td>@item.FechaDeCompra?.ToString("yyyy-MM-dd")</td>
-                <td>@item.FechaVencimiento?.ToString("yyyy-MM-dd")</td>
-            </tr>
-        }
-    </tbody>
-</table>
+@* <h2 class="text-center mb-4">Lista de Compras</h2> *@
 
-@if (User.IsInRole("1") || User.IsInRole("4"))
-{
-    <div>
-        <!-- Opciones para Administrador o Gerente, tal vez botones de acción como editar o eliminar -->
-        <button onclick="location.href='@Url.Action("Edit", "Compra")'">Editar</button>
-        <button onclick="location.href='@Url.Action("Delete", "Compra")'">Eliminar</button>
-    </div>
+<div class="container">
+    @foreach (var item in Model)
+    {
+        <div class="row mb-3 p-2 bg-white border rounded">
+            <div class="col-md-2 mt-1">
+                <img class="img-fluid img-responsive rounded product-image" src="@item.IdproductoNavigation?.ImagenDelProducto ?? Url.Content(" ~ /images/no-image-available.png")">
+            </div>
+            <div class="col-md-6 mt-1">
+                <h5>@item.IdproductoNavigation?.Nombre</h5>
+                <div class="d-flex flex-row">
+                    <div class="ratings mr-2"><i class="fa fa-star"></i></div><span>@item.FechaDeCompra?.ToString("yyyy-MM-dd")</span>
+                </div>
+                <p class="text-justify text-truncate para mb-0">@item.IdproductoNavigation?.DescripcionDelProducto</p>
+            </div>
+            <div class="col-md-4 align-items-center align-content-center">
+                <div class="d-flex flex-row align-items-center">
+                    <h4 class="mr-1">$@item.IdproductoNavigation?.Precio</h4>
+                </div>
+                <div class="d-flex flex-column mt-4">
+                    <button class="btn btn-primary btn-sm" type="button">Detalles</button>
+                    <button class="btn btn-outline-primary btn-sm mt-2" type="button">Guardar para más tarde</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.cantidad').on('change', function () {
+                var id = $(this).data('id');
+                var cantidad = $(this).val();
+                $.post('@Url.Action("UpdateCantidad", "Carrito")', { id: id, cantidad: cantidad })
+                    .done(function (response) {
+                        location.reload(); // Recarga la página para actualizar el subtotal y el total
+                    })
+                    .fail(function (error) {
+                        alert('Error al actualizar la cantidad');
+                    });
+            });
+
+            $('.delete-btn').click(function () {
+                var id = $(this).data('id');
+                $.post('@Url.Action("Delete", "Carrito")', { id: id })
+                    .done(function (response) {
+                        location.reload(); // Recarga la página para actualizar la lista
+                    })
+                    .fail(function (error) {
+                        alert('Error al eliminar el producto');
+                    });
+            });
+
+            $('.save-btn').click(function () {
+                var id = $(this).data('id');
+                var cantidad = $(this).closest('tr').find('.cantidad').val();
+                $.post('@Url.Action("UpdateCantidad", "Carrito")', { id: id, cantidad: cantidad })
+                    .done(function (response) {
+                        alert('Cantidad actualizada');
+                    })
+                    .fail(function (error) {
+                        alert('Error al guardar los cambios');
+                    });
+            });
+        });
+    </script>
 }

@@ -74,8 +74,8 @@
             <div class="search-container">
                 <form class="d-flex" method="get" asp-controller="Home" asp-action="GetByName">
                     <input class="form-control me-2 search-input" type="search" name="search" placeholder="Search" aria-label="Search" autocomplete="off">
+                    <div class="search-results" style="display: none;"></div>
                 </form>
-                <div class="search-results" style="display: none;"></div>
             </div>
         </div>
     </div>
@@ -95,7 +95,6 @@
     <div class="product-info">
         <div class="product-text">
             <h1>@Model.Producto.Nombre</h1>
-
             <p>@Model.Producto.DescripcionDelProducto</p>
         </div>
         <div class="product-price-btn">
@@ -109,6 +108,8 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         var dropdownElements = document.querySelectorAll('.dropdown-menu .dropdown-toggle');
+        var searchInput = document.querySelector('.search-input');
+        var resultsContainer = document.querySelector('.search-results');
 
         dropdownElements.forEach(function (dropdownToggle) {
             dropdownToggle.addEventListener('click', function (e) {
@@ -145,30 +146,22 @@
                 });
             }
         });
-    });
-
-    document.addEventListener('DOMContentLoaded', function () {
-        var searchInput = document.querySelector('.search-input');
-        var resultsContainer = document.querySelector('.search-results');
 
         searchInput.addEventListener('input', function () {
             var searchText = this.value.trim();
 
-            if (searchText.length > 2) { // Asegura al menos 3 caracteres para buscar
+            if (searchText.length > 2) {
                 fetch(`/GetByName?search=${encodeURIComponent(searchText)}`)
                     .then(response => response.json())
                     .then(data => {
-                        resultsContainer.innerHTML = ''; // Limpia resultados anteriores
+                        resultsContainer.innerHTML = '';
                         if (data.length > 0) {
                             data.forEach(item => {
                                 let div = document.createElement('div');
-                                div.textContent = item.nombre; // Asume que el objeto tiene una propiedad 'nombre'
+                                div.textContent = item.nombre;
                                 div.className = 'result-item';
+                                div.onclick = function () { window.location.href = `/OneProduct/${item.idProductos}`; };
                                 resultsContainer.appendChild(div);
-
-                                div.addEventListener('click', () => {
-                                    window.location.href = `/OneProduct/${item.idProductos}`; // Redirige al usuario a la página del producto
-                                });
                             });
                         } else {
                             let div = document.createElement('div');
@@ -176,16 +169,23 @@
                             div.className = 'result-item';
                             resultsContainer.appendChild(div);
                         }
-                        resultsContainer.style.display = 'block'; // Muestra los resultados
+                        resultsContainer.style.display = 'block';
                     });
             } else {
-                resultsContainer.style.display = 'none'; // Oculta los resultados si no hay suficientes caracteres
+                resultsContainer.style.display = 'none';
             }
         });
 
-        // Cierra el desplegable al hacer clic fuera de él
-        document.addEventListener('click', function (e) {
-            if (!searchInput.contains(e.target)) {
+        searchInput.addEventListener('keypress', function (event) {
+            if (event.key === 'Enter' && resultsContainer.firstChild) {
+                event.preventDefault();  
+                resultsContainer.firstChild.click();  
+            }
+        });
+
+     
+        document.addEventListener('click', function (event) {
+            if (!searchInput.contains(event.target)) {
                 resultsContainer.style.display = 'none';
             }
         });

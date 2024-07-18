@@ -66,7 +66,7 @@
                 }
             </ul>
             <div class="search-container">
-                <form class="d-flex" method="get" asp-controller="Home" asp-action="GetByName">
+                <form class="d-flex" method="get" asp-controller="Home" asp-action="GetByName" id="searchForm">
                     <input class="form-control me-2 search-input" type="search" name="search" placeholder="Search" aria-label="Search" autocomplete="off">
                 </form>
                 <div class="search-results" style="display: none;"></div>
@@ -156,20 +156,22 @@
     document.addEventListener('DOMContentLoaded', function () {
         var searchInput = document.querySelector('.search-input');
         var resultsContainer = document.querySelector('.search-results');
+        var searchForm = document.getElementById('searchForm');
 
         searchInput.addEventListener('input', function () {
             var searchText = this.value.trim();
 
-            if (searchText.length > 2) { 
+            if (searchText.length > 2) {
                 fetch(`/GetByName?search=${encodeURIComponent(searchText)}`)
                     .then(response => response.json())
                     .then(data => {
-                        resultsContainer.innerHTML = ''; 
+                        resultsContainer.innerHTML = '';
                         if (data.length > 0) {
                             data.forEach(item => {
                                 let div = document.createElement('div');
-                                div.textContent = item.nombre; 
+                                div.textContent = item.nombre;
                                 div.className = 'result-item';
+                                div.dataset.id = item.idProductos;
                                 resultsContainer.appendChild(div);
 
                                 div.addEventListener('click', () => {
@@ -182,16 +184,25 @@
                             div.className = 'result-item';
                             resultsContainer.appendChild(div);
                         }
-                        resultsContainer.style.display = 'block'; 
+                        resultsContainer.style.display = 'block';
                     });
             } else {
-                resultsContainer.style.display = 'none'; 
+                resultsContainer.style.display = 'none';
             }
         });
 
-   
+        searchForm.addEventListener('keypress', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                var firstResult = resultsContainer.querySelector('.result-item');
+                if (firstResult) {
+                    window.location.href = `/OneProduct/${firstResult.dataset.id}`;
+                }
+            }
+        });
+
         document.addEventListener('click', function (e) {
-            if (!searchInput.contains(e.target)) {
+            if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target)) {
                 resultsContainer.style.display = 'none';
             }
         });

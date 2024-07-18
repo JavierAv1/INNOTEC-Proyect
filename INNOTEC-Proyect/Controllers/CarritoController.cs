@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System;
 using Newtonsoft.Json.Linq;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace INNOTEC_Proyect.Controllers
 {
@@ -89,6 +90,7 @@ namespace INNOTEC_Proyect.Controllers
                             Cantidad = (int)json["cantidad"],
                             FechaDeCompra = DateOnly.Parse(json["fechaDeCompra"].ToString()),
                             FechaVencimiento = DateOnly.Parse(json["fechaVencimiento"].ToString()),
+                            Idproducto = (int)json["idProducto"],
                             IdproductoNavigation = new Producto
                             {
                                 Nombre = (string)json["nombreProducto"],
@@ -107,8 +109,6 @@ namespace INNOTEC_Proyect.Controllers
 
             return View(compras);
         }
-
-
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
@@ -184,7 +184,7 @@ namespace INNOTEC_Proyect.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(int id, Compra compra)
+        public async Task<IActionResult> Update([FromBody] Compra compra)
         {
             ML.Result result = new ML.Result();
             try
@@ -198,7 +198,7 @@ namespace INNOTEC_Proyect.Controllers
                     var jsonContent = JsonConvert.SerializeObject(compra);
                     var content = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
 
-                    var response = await httpClient.PutAsync($"Compra/Update?id={id}", content);
+                    var response = await httpClient.PutAsync("Compra/Update", content);
                     var readContent = await response.Content.ReadAsStringAsync();
 
                     if (response.IsSuccessStatusCode)
@@ -218,7 +218,7 @@ namespace INNOTEC_Proyect.Controllers
                 result.ErrorMessage = ex.Message;
             }
 
-            return View(result);
+            return Json(result);
         }
 
         [HttpDelete]
@@ -253,7 +253,7 @@ namespace INNOTEC_Proyect.Controllers
                 result.ErrorMessage = ex.Message;
             }
 
-            return View(result);
+            return Json(result);
         }
 
         [HttpGet]
