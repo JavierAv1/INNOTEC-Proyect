@@ -1,12 +1,240 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using ML;
+using INNOTEC_Proyect.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace INNOTEC_Proyect.Controllers
 {
     public class CapturistaController : Controller
     {
-        public IActionResult Index()
+        private readonly HttpClient _httpClient;
+        private readonly IConfiguration _configuration;
+
+        public CapturistaController(HttpClient httpClient, IConfiguration configuration)
         {
-            return View();
+            _httpClient = httpClient;
+            _configuration = configuration;
+            _httpClient.BaseAddress = new Uri(_configuration["UrlAPI"]);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Capturista()
+        {
+            var viewModel = new HomeViewModel
+            {
+                MenuItems = await _httpClient.GetFromJsonAsync<List<Departamento>>("Departamento/GetAllDepto"),
+                Categorias = await _httpClient.GetFromJsonAsync<List<Categorium>>("Categoria/GetAll"),
+                Subcategorias = await _httpClient.GetFromJsonAsync<List<Subcategorium>>("Subcategoria/GetAll"),
+                Productos = await _httpClient.GetFromJsonAsync<List<Producto>>("Producto/GetAll"),
+                Proveedores = await _httpClient.GetFromJsonAsync<List<Proveedor>>("Proveedor/GetAll")
+            };
+
+            return View("~/Views/Admin/Capturista.cshtml", viewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateDepartamento(Departamento departamento)
+        {
+            var response = await _httpClient.PostAsJsonAsync("Departamento/InsertDepto", departamento);
+            if (response.IsSuccessStatusCode)
+            {
+                return Json(new { success = true });
+            }
+            return Json(new { success = false, message = "Error al agregar el departamento" });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateProveedor(Proveedor proveedor)
+        {
+            var response = await _httpClient.PostAsJsonAsync("Proveedor/Insert", proveedor);
+            if (response.IsSuccessStatusCode)
+            {
+                return Json(new { success = true });
+            }
+            return Json(new { success = false, message = "Error al agregar el proveedor" });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateCategoria(Categorium categoria)
+        {
+            var response = await _httpClient.PostAsJsonAsync("Categoria/Insert", categoria);
+            if (response.IsSuccessStatusCode)
+            {
+                return Json(new { success = true });
+            }
+            return Json(new { success = false, message = "Error al agregar la categoría" });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateSubcategoria(Subcategorium subcategoria)
+        {
+            var response = await _httpClient.PostAsJsonAsync("Subcategoria/Insert", subcategoria);
+            if (response.IsSuccessStatusCode)
+            {
+                return Json(new { success = true });
+            }
+            return Json(new { success = false, message = "Error al agregar la subcategoría" });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateProducto(Producto producto)
+        {
+            var response = await _httpClient.PostAsJsonAsync("Producto/Insert", producto);
+            if (response.IsSuccessStatusCode)
+            {
+                return Json(new { success = true });
+            }
+            return Json(new { success = false, message = "Error al agregar el producto" });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetDepartamentoById(int id)
+        {
+            var departamento = await _httpClient.GetFromJsonAsync<Departamento>($"Departamento/GetByIdDepto?id={id}");
+            return Json(departamento);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetProveedorById(int id)
+        {
+            var proveedor = await _httpClient.GetFromJsonAsync<Proveedor>($"Proveedor/GetById?id={id}");
+            return Json(proveedor);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetCategoriaById(int id)
+        {
+            var categoria = await _httpClient.GetFromJsonAsync<Categorium>($"Categoria/GetById?id={id}");
+            return Json(categoria);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetSubcategoriaById(int id)
+        {
+            var subcategoria = await _httpClient.GetFromJsonAsync<Subcategorium>($"Subcategoria/GetById?id={id}");
+            return Json(subcategoria);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetProductoById(int id)
+        {
+            var producto = await _httpClient.GetFromJsonAsync<Producto>($"Producto/GetById?id={id}");
+            return Json(producto);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateDepartamento(int id, Departamento departamento)
+        {
+            var response = await _httpClient.PutAsJsonAsync($"Departamento/UpdateDepto?id={id}", departamento);
+            if (response.IsSuccessStatusCode)
+            {
+                return Json(new { success = true });
+            }
+            return Json(new { success = false, message = "Error al actualizar el departamento" });
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateProveedor(int id, Proveedor proveedor)
+        {
+            var response = await _httpClient.PutAsJsonAsync($"Proveedor/Update?id={id}", proveedor);
+            if (response.IsSuccessStatusCode)
+            {
+                return Json(new { success = true });
+            }
+            return Json(new { success = false, message = "Error al actualizar el proveedor" });
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateCategoria(int id, Categorium categoria)
+        {
+            var response = await _httpClient.PutAsJsonAsync($"Categoria/Update?id={id}", categoria);
+            if (response.IsSuccessStatusCode)
+            {
+                return Json(new { success = true });
+            }
+            return Json(new { success = false, message = "Error al actualizar la categoría" });
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateSubcategoria(int id, Subcategorium subcategoria)
+        {
+            var response = await _httpClient.PutAsJsonAsync($"Subcategoria/Update?id={id}", subcategoria);
+            if (response.IsSuccessStatusCode)
+            {
+                return Json(new { success = true });
+            }
+            return Json(new { success = false, message = "Error al actualizar la subcategoría" });
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateProducto(int id, Producto producto)
+        {
+            var response = await _httpClient.PutAsJsonAsync($"Producto/Update?id={id}", producto);
+            if (response.IsSuccessStatusCode)
+            {
+                return Json(new { success = true });
+            }
+            return Json(new { success = false, message = "Error al actualizar el producto" });
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteDepartamento(int id)
+        {
+            var response = await _httpClient.DeleteAsync($"Departamento/DeleteDepto?id={id}");
+            if (response.IsSuccessStatusCode)
+            {
+                return Json(new { success = true });
+            }
+            return Json(new { success = false, message = "Error al eliminar el departamento" });
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteProveedor(int id)
+        {
+            var response = await _httpClient.DeleteAsync($"Proveedor/Delete?id={id}");
+            if (response.IsSuccessStatusCode)
+            {
+                return Json(new { success = true });
+            }
+            return Json(new { success = false, message = "Error al eliminar el proveedor" });
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteCategoria(int id)
+        {
+            var response = await _httpClient.DeleteAsync($"Categoria/Delete?id={id}");
+            if (response.IsSuccessStatusCode)
+            {
+                return Json(new { success = true });
+            }
+            return Json(new { success = false, message = "Error al eliminar la categoría" });
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteSubcategoria(int id)
+        {
+            var response = await _httpClient.DeleteAsync($"Subcategoria/Delete?id={id}");
+            if (response.IsSuccessStatusCode)
+            {
+                return Json(new { success = true });
+            }
+            return Json(new { success = false, message = "Error al eliminar la subcategoría" });
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteProducto(int id)
+        {
+            var response = await _httpClient.DeleteAsync($"Producto/Delete?id={id}");
+            if (response.IsSuccessStatusCode)
+            {
+                return Json(new { success = true });
+            }
+            return Json(new { success = false, message = "Error al eliminar el producto" });
         }
     }
 }
+

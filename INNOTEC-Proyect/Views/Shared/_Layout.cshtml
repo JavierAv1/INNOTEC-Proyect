@@ -31,34 +31,28 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Product" asp-action="Products">Productos</a>
                         </li>
-                        @if (User.IsInRole("1"))
+                        @if (User.IsInRole("1") || User.IsInRole("2") || User.IsInRole("4"))
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Capturista" asp-action="Captura">Gestión de Usuarios</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Capturista" asp-action="Captura">Gestión de productos</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Capturista" asp-action="Captura">Gestión de Envíos</a>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Gestión/Administración
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                    @if (User.IsInRole("1"))
+                                    {
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="Admin" asp-action="Index">Gestión de Usuarios</a></li>
+                                    }
+                                    @if (User.IsInRole("1") || User.IsInRole("2") || User.IsInRole("4"))
+                                    {
+                                        <a class="dropdown-item" asp-area="" asp-controller="Capturista" asp-action="Capturista">Gestión de productos</a>
+                                    }
+                                    @if (User.IsInRole("1") || User.IsInRole("4"))
+                                    {
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="Envios" asp-action="Index">Gestión de Envíos</a></li>
+                                    }
+                                </ul>
                             </li>
                         }
-                        else if (User.IsInRole("2"))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Capturista" asp-action="Captura">Gestión de productos</a>
-                            </li>
-                        }
-                        else if (User.IsInRole("4"))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Capturista" asp-action="Captura">Gestión de productos</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Capturista" asp-action="Captura">Gestión de Envíos</a>
-                            </li>
-                        }
-
                     </ul>
                     <div class="navbar-nav ms-auto d-flex align-items-center">
                         @if (User.Identity.IsAuthenticated)

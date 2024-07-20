@@ -78,8 +78,8 @@
                     Cantidad: parseInt(cantidad),
                     Idusuario: parseInt(idusuario),
                     Idproducto: parseInt(idproducto),
-                    FechaDeCompra: "2024-07-17", 
-                    FechaVencimiento: "2024-08-16" 
+                    FechaDeCompra: new Date().toISOString().split('T')[0], // Fecha actual
+                    FechaVencimiento: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split('T')[0] // Un mes después
                 };
 
                 $.ajax({
@@ -89,7 +89,7 @@
                     data: JSON.stringify(compra),
                     success: function (response) {
                         if (response.success) {
-                            location.reload(); 
+                            location.reload(); // Recarga la página para actualizar los datos
                         } else {
                             alert('Error al actualizar la cantidad: ' + response.errorMessage);
                         }
@@ -105,13 +105,11 @@
                 var id = $(this).data('id');
 
                 $.ajax({
-                    url: '@Url.Action("Delete", "Carrito")',
+                    url: '@Url.Action("Delete", "Carrito")/' + id,
                     type: 'DELETE',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ id: id }),
                     success: function (response) {
                         if (response.success) {
-                            location.reload(); 
+                            location.reload(); // Recarga la página para actualizar la lista
                         } else {
                             alert('Error al eliminar el producto: ' + response.errorMessage);
                         }
@@ -130,3 +128,4 @@
         });
     </script>
 }
+

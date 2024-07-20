@@ -1,0 +1,316 @@
+﻿@model List<ML.Usuario>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Gestión de Usuarios";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - INNOTEC_Proyect</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <div class="container">
+        <main role="main" class="pb-3">
+            <h2>@ViewData["Title"]</h2>
+
+            <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createModal">Agregar Usuario</button>
+
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Apellido Paterno</th>
+                        <th>Apellido Materno</th>
+                        <th>Fecha de Nacimiento</th>
+                        <th>Sexo</th>
+                        <th>UserName</th>
+                        <th>Correo</th>
+                        <th>Teléfono</th>
+                        <th>Celular</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var usuario in Model)
+                    {
+                        <tr>
+                            <td>@usuario.UsuarioId</td>
+                            <td>@usuario.Nombre</td>
+                            <td>@usuario.ApellidoPaterno</td>
+                            <td>@usuario.ApellidoMaterno</td>
+                            <td>@usuario.FechaDeNacimiento</td>
+                            <td>@usuario.Sexo</td>
+                            <td>@usuario.UserName</td>
+                            <td>@usuario.Correo</td>
+                            <td>@usuario.Telefono</td>
+                            <td>@usuario.Celular</td>
+                            <td>
+                                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModal" data-id="@usuario.UsuarioId">Editar</button>
+                                <button class="btn btn-danger" data-id="@usuario.UsuarioId" onclick="deleteUsuario(@usuario.UsuarioId)">Eliminar</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </main>
+    </div>
+
+    <!-- Create Modal -->
+    <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createModalLabel">Agregar Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createForm">
+                        <div class="mb-3">
+                            <label for="createNombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="createNombre" name="Nombre">
+                        </div>
+                        <div class="mb-3">
+                            <label for="createApellidoPaterno" class="form-label">Apellido Paterno</label>
+                            <input type="text" class="form-control" id="createApellidoPaterno" name="ApellidoPaterno">
+                        </div>
+                        <div class="mb-3">
+                            <label for="createApellidoMaterno" class="form-label">Apellido Materno</label>
+                            <input type="text" class="form-control" id="createApellidoMaterno" name="ApellidoMaterno">
+                        </div>
+                        <div class="mb-3">
+                            <label for="createFechaDeNacimiento" class="form-label">Fecha de Nacimiento</label>
+                            <input type="date" class="form-control" id="createFechaDeNacimiento" name="FechaDeNacimiento">
+                        </div>
+                        <div class="mb-3">
+                            <label for="createSexo" class="form-label">Sexo</label>
+                            <select class="form-select" id="createSexo" name="Sexo">
+                                <option value="M">Masculino</option>
+                                <option value="F">Femenino</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="createUserName" class="form-label">UserName</label>
+                            <input type="text" class="form-control" id="createUserName" name="UserName">
+                        </div>
+                        <div class="mb-3">
+                            <label for
+                            <label for="createCorreo" class="form-label">Correo</label>
+                            <input type="email" class="form-control" id="createCorreo" name="Correo">
+                        </div>
+@*                         <div class="mb-3">
+                            <label for="createContraseña" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" id="createContraseña" name="Contraseña">
+                        </div> *@
+                        <div class="mb-3">
+                            <label for="createTelefono" class="form-label">Teléfono</label>
+                            <input type="text" class="form-control" id="createTelefono" name="Telefono">
+                        </div>
+                        <div class="mb-3">
+                            <label for="createCelular" class="form-label">Celular</label>
+                            <input type="text" class="form-control" id="createCelular" name="Celular">
+                        </div>
+                        <div class="mb-3">
+                            <label for="createTipoUsuario" class="form-label">Tipo de Usuario</label>
+                            <select class="form-select" id="createTipoUsuario" name="TipoUsuarioIdTipousuario">
+                                <option value="1">Administrador</option>
+                                <option value="2">Capturista</option>
+                                <option value="3">Cliente</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="createFotoDePerfil" class="form-label">Foto de Perfil</label>
+                            <input type="file" class="form-control" id="createFotoDePerfil" name="FotoDePerfil">
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="createUsuario()">Guardar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Editar Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editForm">
+                        <input type="hidden" id="editUsuarioId" name="UsuarioId">
+                        <div class="mb-3">
+                            <label for="editNombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="editNombre" name="Nombre">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editApellidoPaterno" class="form-label">Apellido Paterno</label>
+                            <input type="text" class="form-control" id="editApellidoPaterno" name="ApellidoPaterno">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editApellidoMaterno" class="form-label">Apellido Materno</label>
+                            <input type="text" class="form-control" id="editApellidoMaterno" name="ApellidoMaterno">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editFechaDeNacimiento" class="form-label">Fecha de Nacimiento</label>
+                            <input type="date" class="form-control" id="editFechaDeNacimiento" name="FechaDeNacimiento">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editSexo" class="form-label">Sexo</label>
+                            <select class="form-select" id="editSexo" name="Sexo">
+                                <option value="M">Masculino</option>
+                                <option value="F">Femenino</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editUserName" class="form-label">UserName</label>
+                            <input type="text" class="form-control" id="editUserName" name="UserName">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editCorreo" class="form-label">Correo</label>
+                            <input type="email" class="form-control" id="editCorreo" name="Correo">
+                        </div>
+@*                         <div class="mb-3">
+                            <label for="editContraseña" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" id="editContraseña" name="Contraseña">
+                        </div> *@
+                        <div class="mb-3">
+                            <label for="editTelefono" class="form-label">Teléfono</label>
+                            <input type="text" class="form-control" id="editTelefono" name="Telefono">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editCelular" class="form-label">Celular</label>
+                            <input type="text" class="form-control" id="editCelular" name="Celular">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editTipoUsuario" class="form-label">Tipo de Usuario</label>
+                            <select class="form-select" id="editTipoUsuario" name="TipoUsuarioIdTipousuario">
+                                <option value="1">Administrador</option>
+                                <option value="2">Capturista</option>
+                                <option value="3">Cliente</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editFotoDePerfil" class="form-label">Foto de Perfil</label>
+                            <input type="file" class="form-control" id="editFotoDePerfil" name="FotoDePerfil">
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="updateUsuario()">Guardar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2024 - INNOTEC_Proyect - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#editModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var id = button.data('id');
+
+                $.getJSON(`/Usuario/GetById?id=${id}`, function (response) {
+                    if (response.success) {
+                        var data = response.data;
+                        $('#editUsuarioId').val(data.usuarioId);
+                        $('#editNombre').val(data.nombre);
+                        $('#editApellidoPaterno').val(data.apellidoPaterno);
+                        $('#editApellidoMaterno').val(data.apellidoMaterno);
+                        $('#editFechaDeNacimiento').val(new Date(data.fechaDeNacimiento).toISOString().substr(0, 10));
+                        $('#editSexo').val(data.sexo);
+                        $('#editUserName').val(data.userName);
+                        $('#editCorreo').val(data.correo);
+                        // $('#editContraseña').val(data.contraseña);
+                        $('#editTelefono').val(data.telefono);
+                        $('#editCelular').val(data.celular);
+                        $('#editTipoUsuario').val(data.tipoUsuarioIdTipousuario);
+                    } else {
+                        alert('Error al cargar los datos del usuario.');
+                    }
+                }).fail(function () {
+                    alert('Error al cargar los datos del usuario.');
+                });
+            });
+        });
+
+        function createUsuario() {
+            var formData = new FormData($('#createForm')[0]);
+
+            $.ajax({
+                url: '/Usuario/Insert',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.success) {
+                        location.reload();
+                    } else {
+                        alert('Error al agregar el usuario.');
+                    }
+                },
+                error: function (xhr) {
+                    alert('Error al agregar el usuario: ' + xhr.responseText);
+                }
+            });
+        }
+
+        function updateUsuario() {
+            var formData = new FormData($('#editForm')[0]);
+            var id = $('#editUsuarioId').val();
+
+            $.ajax({
+                url: `/Usuario/Update?id=${id}`,
+                type: 'PUT',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.success) {
+                        location.reload();
+                    } else {
+                        alert('Error al actualizar el usuario.');
+                    }
+                },
+                error: function (xhr) {
+                    alert('Error al actualizar el usuario: ' + xhr.responseText);
+                }
+            });
+        }
+
+        function deleteUsuario(id) {
+            if (confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
+                $.ajax({
+                    url: `/Usuario/Delete?id=${id}`,
+                    type: 'DELETE',
+                    success: function (response) {
+                        if (response.success) {
+                            location.reload();
+                        } else {
+                            alert('Error al eliminar el usuario.');
+                        }
+                    },
+                    error: function (xhr) {
+                        alert('Error al eliminar el usuario: ' + xhr.responseText);
+                    }
+                });
+            }
+        }
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,1023 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - INNOTEC_Proyect</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <div class="container">
+        <main role="main" class="pb-3">
+            <h2>@ViewData["Title"]</h2>
+
+            <!-- Tabs -->
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="departamentos-tab" data-bs-toggle="tab" data-bs-target="#departamentos" type="button" role="tab" aria-controls="departamentos" aria-selected="true">Departamentos</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="proveedores-tab" data-bs-toggle="tab" data-bs-target="#proveedores" type="button" role="tab" aria-controls="proveedores" aria-selected="false">Proveedores</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="categorias-tab" data-bs-toggle="tab" data-bs-target="#categorias" type="button" role="tab" aria-controls="categorias" aria-selected="false">Categorías</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="subcategorias-tab" data-bs-toggle="tab" data-bs-target="#subcategorias" type="button" role="tab" aria-controls="subcategorias" aria-selected="false">Subcategorías</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="productos-tab" data-bs-toggle="tab" data-bs-target="#productos" type="button" role="tab" aria-controls="productos" aria-selected="false">Productos</button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="myTabContent">
+                <!-- Departamentos Tab -->
+                <div class="tab-pane fade show active" id="departamentos" role="tabpanel" aria-labelledby="departamentos-tab">
+                    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createModalDepartamento">Agregar Departamento</button>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var departamento in Model.MenuItems)
+                            {
+                                <tr>
+                                    <td>@departamento.IdDepartamento</td>
+                                    <td>@departamento.Nombre</td>
+                                    <td>
+                                        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModalDepartamento" data-id="@departamento.IdDepartamento">Editar</button>
+                                        <button class="btn btn-danger" onclick="deleteDepartamento(@departamento.IdDepartamento)">Eliminar</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Proveedores Tab -->
+                <div class="tab-pane fade" id="proveedores" role="tabpanel" aria-labelledby="proveedores-tab">
+                    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createModalProveedor">Agregar Proveedor</button>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Teléfono</th>
+                                <th>Dirección</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var proveedor in Model.Proveedores)
+                            {
+                                <tr>
+                                    <td>@proveedor.IdProveedor</td>
+                                    <td>@proveedor.Nombre</td>
+                                    <td>@proveedor.Telefono</td>
+                                    <td>@proveedor.Direccion</td>
+                                    <td>
+                                        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModalProveedor" data-id="@proveedor.IdProveedor">Editar</button>
+                                        <button class="btn btn-danger" onclick="deleteProveedor(@proveedor.IdProveedor)">Eliminar</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Categorías Tab -->
+                <div class="tab-pane fade" id="categorias" role="tabpanel" aria-labelledby="categorias-tab">
+                    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createModalCategoria">Agregar Categoría</button>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var categoria in Model.Categorias)
+                            {
+                                <tr>
+                                    <td>@categoria.IdCategoria</td>
+                                    <td>@categoria.Nombre</td>
+                                    <td>@categoria.Descripcion</td>
+                                    <td>
+                                        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModalCategoria" data-id="@categoria.IdCategoria">Editar</button>
+                                        <button class="btn btn-danger" onclick="deleteCategoria(@categoria.IdCategoria)">Eliminar</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Subcategorías Tab -->
+                <div class="tab-pane fade" id="subcategorias" role="tabpanel" aria-labelledby="subcategorias-tab">
+                    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createModalSubcategoria">Agregar Subcategoría</button>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var subcategoria in Model.Subcategorias)
+                            {
+                                <tr>
+                                    <td>@subcategoria.IdSubcategoria</td>
+                                    <td>@subcategoria.Nombre</td>
+                                    <td>@subcategoria.Descripcion</td>
+                                    <td>
+                                        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModalSubcategoria" data-id="@subcategoria.IdSubcategoria">Editar</button>
+                                        <button class="btn btn-danger" onclick="deleteSubcategoria(@subcategoria.IdSubcategoria)">Eliminar</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Productos Tab -->
+                <div class="tab-pane fade" id="productos" role="tabpanel" aria-labelledby="productos-tab">
+                    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createModalProducto">Agregar Producto</button>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th>Precio</th>
+                                <th>Cantidad</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var producto in Model.Productos)
+                            {
+                                <tr>
+                                    <td>@producto.IdProductos</td>
+                                    <td>@producto.Nombre</td>
+                                    <td>@producto.DescripcionDelProducto</td>
+                                    <td>@producto.Precio</td>
+                                    <td>@producto.Cantidad</td>
+                                    <td>
+                                        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModalProducto" data-id="@producto.IdProductos">Editar</button>
+                                        <button class="btn btn-danger" onclick="deleteProducto(@producto.IdProductos)">Eliminar</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Create Modals -->
+    <div class="modal fade" id="createModalDepartamento" tabindex="-1" aria-labelledby="createModalDepartamentoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createModalDepartamentoLabel">Agregar Departamento</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createFormDepartamento">
+                        <div class="mb-3">
+                            <label for="createDepartamentoNombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="createDepartamentoNombre" name="Nombre">
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="createDepartamento()">Guardar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="createModalProveedor" tabindex="-1" aria-labelledby="createModalProveedorLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createModalProveedorLabel">Agregar Proveedor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createFormProveedor">
+                        <div class="mb-3">
+                            <label for="createProveedorNombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="createProveedorNombre" name="Nombre">
+                        </div>
+                        <div class="mb-3">
+                            <label for="createProveedorTelefono" class="form-label">Teléfono</label>
+                            <input type="text" class="form-control" id="createProveedorTelefono" name="Telefono">
+                        </div>
+                        <div class="mb-3">
+                            <label for="createProveedorDireccion" class="form-label">Dirección</label>
+                            <input type="text" class="form-control" id="createProveedorDireccion" name="Direccion">
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="createProveedor()">Guardar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="createModalCategoria" tabindex="-1" aria-labelledby="createModalCategoriaLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createModalCategoriaLabel">Agregar Categoría</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createFormCategoria">
+                        <div class="mb-3">
+                            <label for="createCategoriaNombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="createCategoriaNombre" name="Nombre">
+                        </div>
+                        <div class="mb-3">
+                            <label for="createCategoriaDescripcion" class="form-label">Descripción</label>
+                            <input type="text" class="form-control" id="createCategoriaDescripcion" name="Descripcion">
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="createCategoria()">Guardar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="createModalSubcategoria" tabindex="-1" aria-labelledby="createModalSubcategoriaLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createModalSubcategoriaLabel">Agregar Subcategoría</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createFormSubcategoria">
+                        <div class="mb-3">
+                            <label for="createSubcategoriaNombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="createSubcategoriaNombre" name="Nombre">
+                        </div>
+                        <div class="mb-3">
+                            <label for="createSubcategoriaDescripcion" class="form-label">Descripción</label>
+                            <input type="text" class="form-control" id="createSubcategoriaDescripcion" name="Descripcion">
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="createSubcategoria()">Guardar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="createModalProducto" tabindex="-1" aria-labelledby="createModalProductoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createModalProductoLabel">Agregar Producto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createFormProducto">
+                        <div class="mb-3">
+                            <label for="createProductoNombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="createProductoNombre" name="Nombre">
+                        </div>
+                        <div class="mb-3">
+                            <label for="createProductoDescripcion" class="form-label">Descripción</label>
+                            <input type="text" class="form-control" id="createProductoDescripcion" name="DescripcionDelProducto">
+                        </div>
+                        <div class="mb-3">
+                            <label for="createProductoPrecio" class="form-label">Precio</label>
+                            <input type="number" class="form-control" id="createProductoPrecio" name="Precio">
+                        </div>
+                        <div class="mb-3">
+                            <label for="createProductoCantidad" class="form-label">Cantidad</label>
+                            <input type="number" class="form-control" id="createProductoCantidad" name="Cantidad">
+                        </div>
+                        <div class="mb-3">
+                            <label for="createProductoDepartamento" class="form-label">Departamento</label>
+                            <select class="form-select" id="createProductoDepartamento" name="IdDepartamento">
+                                @foreach (var depto in Model.MenuItems)
+                                {
+                                    <option value="@depto.IdDepartamento">@depto.Nombre</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="createProductoCategoria" class="form-label">Categoría</label>
+                            <select class="form-select" id="createProductoCategoria" name="IdCategoria">
+                                @foreach (var categoria in Model.Categorias)
+                                {
+                                    <option value="@categoria.IdCategoria">@categoria.Nombre</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="createProductoSubcategoria" class="form-label">Subcategoría</label>
+                            <select class="form-select" id="createProductoSubcategoria" name="IdSubcategoria">
+                                @foreach (var subcategoria in Model.Subcategorias)
+                                {
+                                    <option value="@subcategoria.IdSubcategoria">@subcategoria.Nombre</option>
+                                }
+                            </select>
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="createProducto()">Guardar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modals -->
+    <div class="modal fade" id="editModalDepartamento" tabindex="-1" aria-labelledby="editModalDepartamentoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalDepartamentoLabel">Editar Departamento</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editFormDepartamento">
+                        <input type="hidden" id="editDepartamentoId" name="IdDepartamento">
+                        <div class="mb-3">
+                            <label for="editDepartamentoNombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="editDepartamentoNombre" name="Nombre">
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="updateDepartamento()">Guardar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editModalProveedor" tabindex="-1" aria-labelledby="editModalProveedorLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalProveedorLabel">Editar Proveedor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editFormProveedor">
+                        <input type="hidden" id="editProveedorId" name="IdProveedor">
+                        <div class="mb-3">
+                            <label for="editProveedorNombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="editProveedorNombre" name="Nombre">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editProveedorTelefono" class="form-label">Teléfono</label>
+                            <input type="text" class="form-control" id="editProveedorTelefono" name="Telefono">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editProveedorDireccion" class="form-label">Dirección</label>
+                            <input type="text" class="form-control" id="editProveedorDireccion" name="Direccion">
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="updateProveedor()">Guardar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editModalCategoria" tabindex="-1" aria-labelledby="editModalCategoriaLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalCategoriaLabel">Editar Categoría</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editFormCategoria">
+                        <input type="hidden" id="editCategoriaId" name="IdCategoria">
+                        <div class="mb-3">
+                            <label for="editCategoriaNombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="editCategoriaNombre" name="Nombre">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editCategoriaDescripcion" class="form-label">Descripción</label>
+                            <input type="text" class="form-control" id="editCategoriaDescripcion" name="Descripcion">
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="updateCategoria()">Guardar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editModalSubcategoria" tabindex="-1" aria-labelledby="editModalSubcategoriaLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalSubcategoriaLabel">Editar Subcategoría</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editFormSubcategoria">
+                        <input type="hidden" id="editSubcategoriaId" name="IdSubcategoria">
+                        <div class="mb-3">
+                            <label for="editSubcategoriaNombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="editSubcategoriaNombre" name="Nombre">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editSubcategoriaDescripcion" class="form-label">Descripción</label>
+                            <input type="text" class="form-control" id="editSubcategoriaDescripcion" name="Descripcion">
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="updateSubcategoria()">Guardar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editModalProducto" tabindex="-1" aria-labelledby="editModalProductoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalProductoLabel">Editar Producto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editFormProducto">
+                        <input type="hidden" id="editProductoId" name="IdProductos">
+                        <div class="mb-3">
+                            <label for="editProductoNombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="editProductoNombre" name="Nombre">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editProductoDescripcion" class="form-label">Descripción</label>
+                            <input type="text" class="form-control" id="editProductoDescripcion" name="DescripcionDelProducto">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editProductoPrecio" class="form-label">Precio</label>
+                            <input type="number" class="form-control" id="editProductoPrecio" name="Precio">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editProductoCantidad" class="form-label">Cantidad</label>
+                            <input type="number" class="form-control" id="editProductoCantidad" name="Cantidad">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editProductoDepartamento" class="form-label">Departamento</label>
+                            <select class="form-select" id="editProductoDepartamento" name="IdDepartamento">
+                                @foreach (var depto in Model.MenuItems)
+                                {
+                                    <option value="@depto.IdDepartamento">@depto.Nombre</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editProductoCategoria" class="form-label">Categoría</label>
+                            <select class="form-select" id="editProductoCategoria" name="IdCategoria">
+                                @foreach (var categoria in Model.Categorias)
+                                {
+                                    <option value="@categoria.IdCategoria">@categoria.Nombre</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editProductoSubcategoria" class="form-label">Subcategoría</label>
+                            <select class="form-select" id="editProductoSubcategoria" name="IdSubcategoria">
+                                @foreach (var subcategoria in Model.Subcategorias)
+                                {
+                                    <option value="@subcategoria.IdSubcategoria">@subcategoria.Nombre</option>
+                                }
+                            </select>
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="updateProducto()">Guardar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2024 - INNOTEC_Proyect - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js"></script>
+    <script>
+        // Function to set the active tab in local storage
+        function setActiveTab(tabName) {
+            localStorage.setItem('activeTab', tabName);
+        }
+
+        // Function to get the active tab from local storage
+        function getActiveTab() {
+            return localStorage.getItem('activeTab') || '#departamentos-tab';
+        }
+
+        // Set the active tab on page load
+        $(document).ready(function () {
+            var activeTab = getActiveTab();
+            $('[href="' + activeTab + '"]').tab('show');
+
+            // Set tab click events to remember the active tab
+            $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+                var tabName = $(e.target).attr('href');
+                setActiveTab(tabName);
+            });
+
+            // Event listeners for modal show to load data for editing
+            $('#editModalDepartamento').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var id = button.data('id');
+                $.getJSON(`/Capturista/GetDepartamentoById?id=${id}`, function (response) {
+                    if (response) {
+                        $('#editDepartamentoId').val(response.idDepartamento);
+                        $('#editDepartamentoNombre').val(response.nombre);
+                    } else {
+                        alert('Error al cargar los datos del departamento.');
+                    }
+                }).fail(function () {
+                    alert('Error al cargar los datos del departamento.');
+                });
+            });
+
+            $('#editModalProveedor').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var id = button.data('id');
+                $.getJSON(`/Capturista/GetProveedorById?id=${id}`, function (response) {
+                    if (response) {
+                        $('#editProveedorId').val(response.idProveedor);
+                        $('#editProveedorNombre').val(response.nombre);
+                        $('#editProveedorTelefono').val(response.telefono);
+                        $('#editProveedorDireccion').val(response.direccion);
+                    } else {
+                        alert('Error al cargar los datos del proveedor.');
+                    }
+                }).fail(function () {
+                    alert('Error al cargar los datos del proveedor.');
+                });
+            });
+
+            $('#editModalCategoria').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var id = button.data('id');
+                $.getJSON(`/Capturista/GetCategoriaById?id=${id}`, function (response) {
+                    if (response) {
+                        $('#editCategoriaId').val(response.idCategoria);
+                        $('#editCategoriaNombre').val(response.nombre);
+                        $('#editCategoriaDescripcion').val(response.descripcion);
+                    } else {
+                        alert('Error al cargar los datos de la categoría.');
+                    }
+                }).fail(function () {
+                    alert('Error al cargar los datos de la categoría.');
+                });
+            });
+
+            $('#editModalSubcategoria').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var id = button.data('id');
+                $.getJSON(`/Capturista/GetSubcategoriaById?id=${id}`, function (response) {
+                    if (response) {
+                        $('#editSubcategoriaId').val(response.idSubcategoria);
+                        $('#editSubcategoriaNombre').val(response.nombre);
+                        $('#editSubcategoriaDescripcion').val(response.descripcion);
+                    } else {
+                        alert('Error al cargar los datos de la subcategoría.');
+                    }
+                }).fail(function () {
+                    alert('Error al cargar los datos de la subcategoría.');
+                });
+            });
+
+            $('#editModalProducto').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var id = button.data('id');
+                $.getJSON(`/Capturista/GetProductoById?id=${id}`, function (response) {
+                    if (response) {
+                        $('#editProductoId').val(response.idProductos);
+                        $('#editProductoNombre').val(response.nombre);
+                        $('#editProductoDescripcion').val(response.descripcionDelProducto);
+                        $('#editProductoPrecio').val(response.precio);
+                        $('#editProductoCantidad').val(response.cantidad);
+                        $('#editProductoDepartamento').val(response.idDepartamento);
+                        $('#editProductoCategoria').val(response.idCategoria);
+                        $('#editProductoSubcategoria').val(response.idSubcategoria);
+                    } else {
+                        alert('Error al cargar los datos del producto.');
+                    }
+                }).fail(function () {
+                    alert('Error al cargar los datos del producto.');
+                });
+            });
+
+            // Event listeners for form submissions
+            $('#createFormDepartamento').on('submit', function (e) {
+                e.preventDefault();
+                createDepartamento();
+            });
+
+            $('#editFormDepartamento').on('submit', function (e) {
+                e.preventDefault();
+                updateDepartamento();
+            });
+
+            $('#createFormProveedor').on('submit', function (e) {
+                e.preventDefault();
+                createProveedor();
+            });
+
+            $('#editFormProveedor').on('submit', function (e) {
+                e.preventDefault();
+                updateProveedor();
+            });
+
+            $('#createFormCategoria').on('submit', function (e) {
+                e.preventDefault();
+                createCategoria();
+            });
+
+            $('#editFormCategoria').on('submit', function (e) {
+                e.preventDefault();
+                updateCategoria();
+            });
+
+            $('#createFormSubcategoria').on('submit', function (e) {
+                e.preventDefault();
+                createSubcategoria();
+            });
+
+            $('#editFormSubcategoria').on('submit', function (e) {
+                e.preventDefault();
+                updateSubcategoria();
+            });
+
+            $('#createFormProducto').on('submit', function (e) {
+                e.preventDefault();
+                createProducto();
+            });
+
+            $('#editFormProducto').on('submit', function (e) {
+                e.preventDefault();
+                updateProducto();
+            });
+        });
+
+        // CRUD functions for each entity
+
+        // Departamento
+        function createDepartamento() {
+            var formData = new FormData($('#createFormDepartamento')[0]);
+            $.ajax({
+                url: '/Capturista/CreateDepartamento',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function (response) {
+                    if (response.success) {
+                        location.reload();
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function (xhr) {
+                    alert('Error al agregar el departamento: ' + xhr.responseText);
+                }
+            });
+        }
+
+        function updateDepartamento() {
+            var formData = {
+                IdDepartamento: $('#editDepartamentoId').val(),
+                Nombre: $('#editDepartamentoNombre').val()
+            };
+            $.ajax({
+                url: `/Capturista/UpdateDepartamento?id=${formData.IdDepartamento}`,
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function (response) {
+                    if (response.success) {
+                        location.reload();
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function (xhr) {
+                    alert('Error al actualizar el departamento: ' + xhr.responseText);
+                }
+            });
+        }
+
+        function deleteDepartamento(id) {
+            if (confirm('¿Estás seguro de que deseas eliminar este departamento?')) {
+                $.ajax({
+                    url: `/Capturista/DeleteDepartamento?id=${id}`,
+                    type: 'DELETE',
+                    success: function (response) {
+                        if (response.success) {
+                            location.reload();
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function (xhr) {
+                        alert('Error al eliminar el departamento: ' + xhr.responseText);
+                    }
+                });
+            }
+        }
+
+        // Proveedor
+        function createProveedor() {
+            var formData = {
+                Nombre: $('#createProveedorNombre').val(),
+                Telefono: $('#createProveedorTelefono').val(),
+                Direccion: $('#createProveedorDireccion').val()
+            };
+            $.ajax({
+                url: '/Capturista/CreateProveedor',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function (response) {
+                    if (response.success) {
+                        location.reload();
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function (xhr) {
+                    alert('Error al agregar el proveedor: ' + xhr.responseText);
+                }
+            });
+        }
+
+        function updateProveedor() {
+            var formData = {
+                IdProveedor: $('#editProveedorId').val(),
+                Nombre: $('#editProveedorNombre').val(),
+                Telefono: $('#editProveedorTelefono').val(),
+                Direccion: $('#editProveedorDireccion').val()
+            };
+            $.ajax({
+                url: `/Capturista/UpdateProveedor?id=${formData.IdProveedor}`,
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function (response) {
+                    if (response.success) {
+                        location.reload();
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function (xhr) {
+                    alert('Error al actualizar el proveedor: ' + xhr.responseText);
+                }
+            });
+        }
+
+        function deleteProveedor(id) {
+            if (confirm('¿Estás seguro de que deseas eliminar este proveedor?')) {
+                $.ajax({
+                    url: `/Capturista/DeleteProveedor?id=${id}`,
+                    type: 'DELETE',
+                    success: function (response) {
+                        if (response.success) {
+                            location.reload();
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function (xhr) {
+                        alert('Error al eliminar el proveedor: ' + xhr.responseText);
+                    }
+                });
+            }
+        }
+
+        // Categoria
+        function createCategoria() {
+            var formData = {
+                Nombre: $('#createCategoriaNombre').val(),
+                Descripcion: $('#createCategoriaDescripcion').val()
+            };
+            $.ajax({
+                url: '/Capturista/CreateCategoria',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function (response) {
+                    if (response.success) {
+                        location.reload();
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function (xhr) {
+                    alert('Error al agregar la categoría: ' + xhr.responseText);
+                }
+            });
+        }
+
+        function updateCategoria() {
+            var formData = {
+                IdCategoria: $('#editCategoriaId').val(),
+                Nombre: $('#editCategoriaNombre').val(),
+                Descripcion: $('#editCategoriaDescripcion').val()
+            };
+            $.ajax({
+                url: `/Capturista/UpdateCategoria?id=${formData.IdCategoria}`,
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function (response) {
+                    if (response.success) {
+                        location.reload();
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function (xhr) {
+                    alert('Error al actualizar la categoría: ' + xhr.responseText);
+                }
+            });
+        }
+
+        function deleteCategoria(id) {
+            if (confirm('¿Estás seguro de que deseas eliminar esta categoría?')) {
+                $.ajax({
+                    url: `/Capturista/DeleteCategoria?id=${id}`,
+                    type: 'DELETE',
+                    success: function (response) {
+                        if (response.success) {
+                            location.reload();
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function (xhr) {
+                        alert('Error al eliminar la categoría: ' + xhr.responseText);
+                    }
+                });
+            }
+        }
+
+        // Subcategoria
+        function createSubcategoria() {
+            var formData = {
+                Nombre: $('#createSubcategoriaNombre').val(),
+                Descripcion: $('#createSubcategoriaDescripcion').val()
+            };
+            $.ajax({
+                url: '/Capturista/CreateSubcategoria',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function (response) {
+                    if (response.success) {
+                        location.reload();
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function (xhr) {
+                    alert('Error al agregar la subcategoría: ' + xhr.responseText);
+                }
+            });
+        }
+
+        function updateSubcategoria() {
+            var formData = {
+                IdSubcategoria: $('#editSubcategoriaId').val(),
+                Nombre: $('#editSubcategoriaNombre').val(),
+                Descripcion: $('#editSubcategoriaDescripcion').val()
+            };
+            $.ajax({
+                url: `/Capturista/UpdateSubcategoria?id=${formData.IdSubcategoria}`,
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function (response) {
+                    if (response.success) {
+                        location.reload();
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function (xhr) {
+                    alert('Error al actualizar la subcategoría: ' + xhr.responseText);
+                }
+            });
+        }
+
+        function deleteSubcategoria(id) {
+            if (confirm('¿Estás seguro de que deseas eliminar esta subcategoría?')) {
+                $.ajax({
+                    url: `/Capturista/DeleteSubcategoria?id=${id}`,
+                    type: 'DELETE',
+                    success: function (response) {
+                        if (response.success) {
+                            location.reload();
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function (xhr) {
+                        alert('Error al eliminar la subcategoría: ' + xhr.responseText);
+                    }
+                });
+            }
+        }
+
+        // Producto
+        function createProducto() {
+            var formData = {
+                Nombre: $('#createProductoNombre').val(),
+                DescripcionDelProducto: $('#createProductoDescripcion').val(),
+                Precio: $('#createProductoPrecio').val(),
+                Cantidad: $('#createProductoCantidad').val(),
+                IdDepartamento: $('#createProductoDepartamento').val(),
+                IdCategoria: $('#createProductoCategoria').val(),
+                IdSubcategoria: $('#createProductoSubcategoria').val()
+            };
+            $.ajax({
+                url: '/Capturista/CreateProducto',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function (response) {
+                    if (response.success) {
+                        location.reload();
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function (xhr) {
+                    alert('Error al agregar el producto: ' + xhr.responseText);
+                }
+            });
+        }
+
+        function updateProducto() {
+            var formData = {
+                IdProductos: $('#editProductoId').val(),
+                Nombre: $('#editProductoNombre').val(),
+                DescripcionDelProducto: $('#editProductoDescripcion').val(),
+                Precio: $('#editProductoPrecio').val(),
+                Cantidad: $('#editProductoCantidad').val(),
+                IdDepartamento: $('#editProductoDepartamento').val(),
+                IdCategoria: $('#editProductoCategoria').val(),
+                IdSubcategoria: $('#editProductoSubcategoria').val()
+            };
+            $.ajax({
+                url: `/Capturista/UpdateProducto?id=${formData.IdProductos}`,
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function (response) {
+                    if (response.success) {
+                        location.reload();
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function (xhr) {
+                    alert('Error al actualizar el producto: ' + xhr.responseText);
+                }
+            });
+        }
+
+        function deleteProducto(id) {
+            if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
+                $.ajax({
+                    url: `/Capturista/DeleteProducto?id=${id}`,
+                    type: 'DELETE',
+                    success: function (response) {
+                        if (response.success) {
+                            location.reload();
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function (xhr) {
+                        alert('Error al eliminar el producto: ' + xhr.responseText);
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+
+
