@@ -54,20 +54,17 @@ namespace INNOTEC_Proyect.Controllers
                             result.Object = usuario;
                             result.Success = true;
 
-                           
                             var claims = new List<Claim>
-                            {
-                                new Claim(ClaimTypes.Name, usuario.UserName),
-                                new Claim("FullName", usuario.Nombre),
-                                new Claim(ClaimTypes.Role, usuario.TipoUsuarioIdTipousuario.ToString()),
-                                new Claim("UserId", usuario.UsuarioId.ToString()),
-                                new Claim("TipoUsuarioId", usuario.TipoUsuarioIdTipousuario.ToString())
-
-                            };
+                    {
+                        new Claim(ClaimTypes.Name, usuario.UserName),
+                        new Claim("FullName", usuario.Nombre),
+                        new Claim(ClaimTypes.Role, usuario.TipoUsuarioIdTipousuario.ToString()),
+                        new Claim("UserId", usuario.UsuarioId.ToString()),
+                        new Claim("TipoUsuarioId", usuario.TipoUsuarioIdTipousuario.ToString())
+                    };
 
                             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-                           
                             var authProperties = new AuthenticationProperties
                             {
                                 IsPersistent = true,
@@ -104,9 +101,10 @@ namespace INNOTEC_Proyect.Controllers
             else
             {
                 ViewBag.Message = "Contraseña o UserName incorrecto ";
-                return PartialView("Modal");
+                return View("Login"); 
             }
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Register(ML.Usuario usuario)

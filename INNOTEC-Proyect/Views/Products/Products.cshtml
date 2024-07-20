@@ -25,8 +25,8 @@
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink@dept.IdDepartamento">
                             @if (dept.Productos.Any())
                             {
-                                <li>
-                                    <a class="dropdown-item" href="#">Productos del Departamento</a>
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">Productos del Departamento</a>
                                     <ul class="dropdown-menu">
                                         @foreach (var prod in dept.Productos)
                                         {
@@ -42,8 +42,8 @@
                                     <ul class="dropdown-menu">
                                         @if (cat.Productos.Any())
                                         {
-                                            <li>
-                                                <a class="dropdown-item" href="#">Productos de la Categoría</a>
+                                            <li class="dropdown-submenu">
+                                                <a class="dropdown-item dropdown-toggle" href="#">Productos de la Categoría</a>
                                                 <ul class="dropdown-menu">
                                                     @foreach (var prod in cat.Productos)
                                                     {
@@ -71,10 +71,10 @@
                     </li>
                 }
             </ul>
-            <div class="search-container">
-                <form class="d-flex" action="javascript:void(0);" method="get">
-                    <input class="form-control me-2 search-input" type="search" placeholder="Search" aria-label="Search" autocomplete="off">
-                    <div class="search-results" style="position: absolute; background-color: white; width: 100%; display: none;"></div>
+            <div class="search-container position-relative">
+                <form class="d-flex" method="get" asp-controller="Home" asp-action="GetByName">
+                    <input class="form-control me-2 search-input" type="search" name="search" placeholder="Search" aria-label="Search" autocomplete="off">
+                    <div class="search-results dropdown-menu" style="display: none;"></div>
                 </form>
             </div>
         </div>
@@ -141,6 +141,7 @@
     </div>
 </div>
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     function addCarrito(idProducto) {
@@ -155,7 +156,9 @@
     }
 
     document.addEventListener("DOMContentLoaded", function () {
-        var dropdownElements = document.querySelectorAll('.dropdown-menu .dropdown-toggle');
+        var dropdownElements = document.querySelectorAll('.dropdown-toggle');
+        var searchInput = document.querySelector('.search-input');
+        var resultsContainer = document.querySelector('.search-results');
 
         dropdownElements.forEach(function (dropdownToggle) {
             dropdownToggle.addEventListener('click', function (e) {
@@ -163,20 +166,16 @@
                 e.stopPropagation();
 
                 var submenu = this.nextElementSibling;
-                var parentLi = this.closest('li');
 
-                if (!submenu.classList.contains('show')) {
-                    var openMenus = this.closest('.dropdown-menu').querySelectorAll('.dropdown-menu.show');
+                if (submenu && !submenu.classList.contains('show')) {
+                    var openMenus = document.querySelectorAll('.dropdown-menu.show');
                     openMenus.forEach(function (openMenu) {
                         openMenu.classList.remove('show');
-                        openMenu.closest('li').classList.remove('show');
                     });
 
                     submenu.classList.add('show');
-                    parentLi.classList.add('show');
-                } else {
+                } else if (submenu) {
                     submenu.classList.remove('show');
-                    parentLi.classList.remove('show');
                 }
             });
         });
@@ -186,17 +185,9 @@
                 var openMenus = document.querySelectorAll('.dropdown-menu.show');
                 openMenus.forEach(function (openMenu) {
                     openMenu.classList.remove('show');
-                    if (openMenu.closest('li')) {
-                        openMenu.closest('li').classList.remove('show');
-                    }
                 });
             }
         });
-    });
-
-    document.addEventListener("DOMContentLoaded", function () {
-        var searchInput = document.querySelector('.search-input');
-        var resultsContainer = document.querySelector('.search-results');
 
         searchInput.addEventListener('input', function () {
             var searchText = this.value.trim();
@@ -210,7 +201,7 @@
                             data.forEach(item => {
                                 let div = document.createElement('div');
                                 div.textContent = item.nombre;
-                                div.className = 'result-item';
+                                div.className = 'dropdown-item';
                                 div.onclick = function () { window.location.href = `/OneProduct/${item.idProductos}`; };
                                 resultsContainer.appendChild(div);
                             });
@@ -218,7 +209,7 @@
                         } else {
                             let div = document.createElement('div');
                             div.textContent = 'No results found';
-                            div.className = 'result-item';
+                            div.className = 'dropdown-item';
                             resultsContainer.appendChild(div);
                             resultsContainer.style.display = 'block';
                         }
@@ -230,17 +221,16 @@
 
         searchInput.addEventListener('keypress', function (event) {
             if (event.key === 'Enter' && resultsContainer.firstChild) {
-                event.preventDefault();  // Prevent form submission
-                resultsContainer.firstChild.click();  // Simulate click on the first search result
+                event.preventDefault();
+                resultsContainer.firstChild.click(); 
             }
         });
 
-        // Close the results container when clicking outside
+  
         document.addEventListener('click', function (event) {
             if (!searchInput.contains(event.target)) {
                 resultsContainer.style.display = 'none';
             }
         });
     });
-
 </script>

@@ -19,10 +19,17 @@
                                     <h4 class="mt-1 mb-5 pb-1">We are The Lotus Team</h4>
                                 </div>
 
+                                @if (ViewBag.Message != null)
+                                {
+                                    <div class="alert alert-danger" role="alert">
+                                        @ViewBag.Message
+                                    </div>
+                                }
+
                                 <form id="loginForm" method="post" action="/Login/Login">
                                     <p id="formTitle">Please login to your account</p>
 
-                                    <div class="form-outline mb-4">
+                                    <div class="form-outline mb-4" id="userNameOrEmailDiv">
                                         <input type="text" id="userNameOrEmail" name="userNameOrEmail" class="form-control" placeholder="Username or Email" required />
                                         <label class="form-label" for="userNameOrEmail">Username or Email</label>
                                     </div>
@@ -33,6 +40,10 @@
                                     </div>
 
                                     <div id="extraFields" style="display: none;">
+                                        <div class="form-outline mb-4">
+                                            <input type="text" id="userName" name="userName" class="form-control" placeholder="Username" />
+                                            <label class="form-label" for="userName">Username</label>
+                                        </div>
                                         <div class="form-outline mb-4">
                                             <input type="email" id="email" name="Correo" class="form-control" placeholder="Email" />
                                             <label class="form-label" for="email">Email</label>
@@ -99,35 +110,42 @@
 </section>
 
 <script>
-    document.getElementById('toggleButton').addEventListener('click', function () {
-        var isLogin = document.getElementById('submitButton').textContent === 'Log in';
-        document.getElementById('formTitle').textContent = isLogin ? 'Please create a new account' : 'Please login to your account';
-        document.getElementById('submitButton').textContent = isLogin ? 'Register' : 'Log in';
-        document.getElementById('toggleText').textContent = isLogin ? 'Already have an account?' : "Don't have an account?";
-        document.getElementById('toggleButton').textContent = isLogin ? 'Login' : 'Create new';
-        document.getElementById('extraFields').style.display = isLogin ? 'block' : 'none';
+    document.addEventListener('DOMContentLoaded', function () {
+        const loginForm = document.getElementById('loginForm');
+        const submitButton = document.getElementById('submitButton');
+        const toggleButton = document.getElementById('toggleButton');
+        const userNameOrEmailDiv = document.getElementById('userNameOrEmailDiv');
+        const extraFields = document.getElementById('extraFields');
 
-        if (isLogin) {
-            document.getElementById('email').required = true;
-            document.getElementById('firstName').required = true;
-            document.getElementById('lastName').required = true;
-            document.getElementById('dob').required = true;
-            document.getElementById('gender').required = true;
-        } else {
-            document.getElementById('email').required = false;
-            document.getElementById('firstName').required = false;
-            document.getElementById('lastName').required = false;
-            document.getElementById('dob').required = false;
-            document.getElementById('gender').required = false;
-        }
+        toggleButton.addEventListener('click', function () {
+            const isLogin = submitButton.textContent === 'Log in';
+            document.getElementById('formTitle').textContent = isLogin ? 'Please create a new account' : 'Please login to your account';
+            submitButton.textContent = isLogin ? 'Register' : 'Log in';
+            document.getElementById('toggleText').textContent = isLogin ? 'Already have an account?' : "Don't have an account?";
+            toggleButton.textContent = isLogin ? 'Login' : 'Create new';
 
-        document.getElementById('loginForm').action = isLogin ? '/Login/Register' : '/Login/Login';
-    });
+            userNameOrEmailDiv.style.display = isLogin ? 'none' : 'block';
+            extraFields.style.display = isLogin ? 'block' : 'none';
 
-    document.getElementById('loginForm').addEventListener('keypress', function (event) {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            document.getElementById('submitButton').click();
-        }
+            document.getElementById('userName').required = isLogin;
+            document.getElementById('email').required = isLogin;
+            document.getElementById('firstName').required = isLogin;
+            document.getElementById('lastName').required = isLogin;
+            document.getElementById('dob').required = isLogin;
+            document.getElementById('gender').required = isLogin;
+
+            loginForm.action = isLogin ? '/Login/Register' : '/Login/Login';
+        });
+
+        loginForm.addEventListener('submit', function () {
+            submitButton.disabled = true;
+        });
+
+        loginForm.addEventListener('keypress', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                submitButton.click();
+            }
+        });
     });
 </script>
