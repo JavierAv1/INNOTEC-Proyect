@@ -507,9 +507,6 @@
         </div>
     </footer>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js"></script>
     <script>
         // Function to set the active tab in local storage
         function setActiveTab(tabName) {
@@ -678,8 +675,9 @@
             $.ajax({
                 url: '/Capturista/CreateDepartamento',
                 type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(formData),
+                data: formData,
+                processData: false,
+                contentType: false,
                 success: function (response) {
                     if (response.success) {
                         location.reload();

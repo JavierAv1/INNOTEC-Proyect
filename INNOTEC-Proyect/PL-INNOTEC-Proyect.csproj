@@ -9,10 +9,12 @@
 
   <ItemGroup>
     <Content Remove="wwwroot\css\stylecatalogo.css" />
+    <Content Remove="wwwroot\js\carrito.js" />
   </ItemGroup>
 
   <ItemGroup>
     <_ContentIncludedByDefault Remove="wwwroot\css\stylecarrito.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\js\carrito.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,6 +34,7 @@
     <None Include="wwwroot\Images\logo.jpg" />
     <None Include="wwwroot\Images\no-image-available.png" />
     <None Include="wwwroot\Images\usuario.png" />
+    <None Include="wwwroot\js\carrito.js" />
   </ItemGroup>
 
   <ItemGroup>

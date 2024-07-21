@@ -141,8 +141,6 @@
     </div>
 </div>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     function addCarrito(idProducto) {
         $.post('@Url.Action("AddCarrito", "Carrito")', { idProducto: idProducto })
@@ -154,83 +152,5 @@
                 alert('Error al agregar el producto al carrito.');
             });
     }
-
-    document.addEventListener("DOMContentLoaded", function () {
-        var dropdownElements = document.querySelectorAll('.dropdown-toggle');
-        var searchInput = document.querySelector('.search-input');
-        var resultsContainer = document.querySelector('.search-results');
-
-        dropdownElements.forEach(function (dropdownToggle) {
-            dropdownToggle.addEventListener('click', function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-
-                var submenu = this.nextElementSibling;
-
-                if (submenu && !submenu.classList.contains('show')) {
-                    var openMenus = document.querySelectorAll('.dropdown-menu.show');
-                    openMenus.forEach(function (openMenu) {
-                        openMenu.classList.remove('show');
-                    });
-
-                    submenu.classList.add('show');
-                } else if (submenu) {
-                    submenu.classList.remove('show');
-                }
-            });
-        });
-
-        document.addEventListener('click', function (e) {
-            if (!e.target.matches('.dropdown-toggle')) {
-                var openMenus = document.querySelectorAll('.dropdown-menu.show');
-                openMenus.forEach(function (openMenu) {
-                    openMenu.classList.remove('show');
-                });
-            }
-        });
-
-        searchInput.addEventListener('input', function () {
-            var searchText = this.value.trim();
-
-            if (searchText.length > 2) {
-                fetch(`/GetByName?search=${encodeURIComponent(searchText)}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        resultsContainer.innerHTML = '';
-                        if (data.length > 0) {
-                            data.forEach(item => {
-                                let div = document.createElement('div');
-                                div.textContent = item.nombre;
-                                div.className = 'dropdown-item';
-                                div.onclick = function () { window.location.href = `/OneProduct/${item.idProductos}`; };
-                                resultsContainer.appendChild(div);
-                            });
-                            resultsContainer.style.display = 'block';
-                        } else {
-                            let div = document.createElement('div');
-                            div.textContent = 'No results found';
-                            div.className = 'dropdown-item';
-                            resultsContainer.appendChild(div);
-                            resultsContainer.style.display = 'block';
-                        }
-                    });
-            } else {
-                resultsContainer.style.display = 'none';
-            }
-        });
-
-        searchInput.addEventListener('keypress', function (event) {
-            if (event.key === 'Enter' && resultsContainer.firstChild) {
-                event.preventDefault();
-                resultsContainer.firstChild.click(); 
-            }
-        });
-
-  
-        document.addEventListener('click', function (event) {
-            if (!searchInput.contains(event.target)) {
-                resultsContainer.style.display = 'none';
-            }
-        });
-    });
 </script>
+
