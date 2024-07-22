@@ -36,6 +36,7 @@ namespace INNOTEC_Proyect.Controllers
             return View("~/Views/Admin/Capturista.cshtml", viewModel);
         }
 
+        // Create methods
         [HttpPost]
         public async Task<IActionResult> CreateDepartamento([FromBody] Departamento departamento)
         {
@@ -91,6 +92,7 @@ namespace INNOTEC_Proyect.Controllers
             return Json(new { success = false, message = "Error al agregar el producto" });
         }
 
+        // Update methods
         [HttpPut]
         public async Task<IActionResult> UpdateDepartamento(int id, [FromBody] Departamento departamento)
         {
@@ -146,6 +148,7 @@ namespace INNOTEC_Proyect.Controllers
             return Json(new { success = false, message = "Error al actualizar el producto" });
         }
 
+        // Delete methods
         [HttpDelete]
         public async Task<IActionResult> DeleteDepartamento(int id)
         {
@@ -199,6 +202,62 @@ namespace INNOTEC_Proyect.Controllers
                 return Json(new { success = true });
             }
             return Json(new { success = false, message = "Error al eliminar el producto" });
+        }
+
+        // GetById methods
+        [HttpGet]
+        public async Task<IActionResult> GetDepartamentoById(int id)
+        {
+            var departamento = await _httpClient.GetFromJsonAsync<Departamento>($"Departamento/GetByIdDepto?id={id}");
+            if (departamento != null)
+            {
+                return Json(departamento);
+            }
+            return Json(null);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetProveedorById(int id)
+        {
+            var proveedor = await _httpClient.GetFromJsonAsync<Proveedor>($"Proveedor/GetById?id={id}");
+            if (proveedor != null)
+            {
+                return Json(proveedor);
+            }
+            return Json(null);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetCategoriaById(int id)
+        {
+            var categoria = await _httpClient.GetFromJsonAsync<Categorium>($"Categoria/GetById?id={id}");
+            if (categoria != null)
+            {
+                return Json(categoria);
+            }
+            return Json(null);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetSubcategoriaById(int id)
+        {
+            var subcategoria = await _httpClient.GetFromJsonAsync<Subcategorium>($"Subcategoria/GetById?id={id}");
+            if (subcategoria != null)
+            {
+                return Json(subcategoria);
+            }
+            return Json(null);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetProductoById(int id)
+        {
+            var producto = await _httpClient.GetFromJsonAsync<Producto>($"Producto/GetById?id={id}");
+            if (producto != null)
+            {
+                return Json(producto);
+            }
+            return Json(null);
         }
     }
 }

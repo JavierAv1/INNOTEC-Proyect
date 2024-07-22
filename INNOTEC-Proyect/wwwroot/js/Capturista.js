@@ -19,7 +19,7 @@ $(document).ready(function () {
         var button = $(event.relatedTarget);
         var id = button.data('id');
         console.log(`Fetching data for Departamento ID: ${id}`);
-        $.getJSON(`/Capturista/GetDepartamentoById?id=${id}`, function (response) {
+        $.getJSON(`/api/Departamento/GetByIdDepto?id=${id}`, function (response) {
             console.log('Response:', response);
             if (response) {
                 $('#editDepartamentoId').val(response.idDepartamento);
@@ -36,7 +36,7 @@ $(document).ready(function () {
         var button = $(event.relatedTarget);
         var id = button.data('id');
         console.log(`Fetching data for Proveedor ID: ${id}`);
-        $.getJSON(`/Capturista/GetProveedorById?id=${id}`, function (response) {
+        $.getJSON(`/api/Proveedor/GetById?id=${id}`, function (response) {
             console.log('Response:', response);
             if (response) {
                 $('#editProveedorId').val(response.idProveedor);
@@ -55,7 +55,7 @@ $(document).ready(function () {
         var button = $(event.relatedTarget);
         var id = button.data('id');
         console.log(`Fetching data for Categoria ID: ${id}`);
-        $.getJSON(`/Capturista/GetCategoriaById?id=${id}`, function (response) {
+        $.getJSON(`/api/Categoria/GetById?id=${id}`, function (response) {
             console.log('Response:', response);
             if (response) {
                 $('#editCategoriaId').val(response.idCategoria);
@@ -74,7 +74,7 @@ $(document).ready(function () {
         var button = $(event.relatedTarget);
         var id = button.data('id');
         console.log(`Fetching data for Subcategoria ID: ${id}`);
-        $.getJSON(`/Capturista/GetSubcategoriaById?id=${id}`, function (response) {
+        $.getJSON(`/api/Subcategoria/GetById?id=${id}`, function (response) {
             console.log('Response:', response);
             if (response) {
                 $('#editSubcategoriaId').val(response.idSubcategoria);
@@ -93,7 +93,7 @@ $(document).ready(function () {
         var button = $(event.relatedTarget);
         var id = button.data('id');
         console.log(`Fetching data for Producto ID: ${id}`);
-        $.getJSON(`/Capturista/GetProductoById?id=${id}`, function (response) {
+        $.getJSON(`/api/Producto/GetById?id=${id}`, function (response) {
             console.log('Response:', response);
             if (response) {
                 $('#editProductoId').val(response.idProductos);
