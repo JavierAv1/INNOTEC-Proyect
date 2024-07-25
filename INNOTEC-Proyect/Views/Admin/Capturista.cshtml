@@ -7,7 +7,7 @@
         <!-- Tabs -->
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="departamentos-tab" data-bs-toggle="tab" data-bs-target="#departamentos" type="button" role="tab" aria-controls="departamentos" aria-selected="true">Departamentos</button>
+                <button class="nav-link" id="departamentos-tab" data-bs-toggle="tab" data-bs-target="#departamentos" type="button" role="tab" aria-controls="departamentos" aria-selected="false">Departamentos</button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="proveedores-tab" data-bs-toggle="tab" data-bs-target="#proveedores" type="button" role="tab" aria-controls="proveedores" aria-selected="false">Proveedores</button>
@@ -25,173 +25,185 @@
 
         <div class="tab-content" id="myTabContent">
             <!-- Departamentos Tab -->
-            <div class="tab-pane fade show active" id="departamentos" role="tabpanel" aria-labelledby="departamentos-tab">
+            <div class="tab-pane fade" id="departamentos" role="tabpanel" aria-labelledby="departamentos-tab">
                 <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createModalDepartamento">Agregar Departamento</button>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var departamento in Model.MenuItems)
-                        {
+                <div id="departamentos-content">
+                    <table class="table table-striped">
+                        <thead>
                             <tr>
-                                <td>@departamento.IdDepartamento</td>
-                                <td>@departamento.Nombre</td>
-                                <td>
-                                    <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModalDepartamento" data-id="@departamento.IdDepartamento">Editar</button>
-                                    <button class="btn btn-danger" onclick="deleteDepartamento(@departamento.IdDepartamento)">Eliminar</button>
-                                </td>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Acciones</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach (var departamento in Model.MenuItems)
+                            {
+                                <tr>
+                                    <td>@departamento.IdDepartamento</td>
+                                    <td>@departamento.Nombre</td>
+                                    <td>
+                                        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModalDepartamento" data-id="@departamento.IdDepartamento">Editar</button>
+                                        <button class="btn btn-danger" data-id="@departamento.IdDepartamento" onclick="deleteDepartamento(@departamento.IdDepartamento)">Eliminar</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- Proveedores Tab -->
             <div class="tab-pane fade" id="proveedores" role="tabpanel" aria-labelledby="proveedores-tab">
                 <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createModalProveedor">Agregar Proveedor</button>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Teléfono</th>
-                            <th>Dirección</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var proveedor in Model.Proveedores)
-                        {
+                <div id="proveedores-content">
+                    <table class="table table-striped">
+                        <thead>
                             <tr>
-                                <td>@proveedor.IdProveedor</td>
-                                <td>@proveedor.Nombre</td>
-                                <td>@proveedor.Telefono</td>
-                                <td>@proveedor.Direccion</td>
-                                <td>
-                                    <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModalProveedor" data-id="@proveedor.IdProveedor">Editar</button>
-                                    <button class="btn btn-danger" onclick="deleteProveedor(@proveedor.IdProveedor)">Eliminar</button>
-                                </td>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Teléfono</th>
+                                <th>Dirección</th>
+                                <th>Acciones</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach (var proveedor in Model.Proveedores)
+                            {
+                                <tr>
+                                    <td>@proveedor.IdProveedor</td>
+                                    <td>@proveedor.Nombre</td>
+                                    <td>@proveedor.Telefono</td>
+                                    <td>@proveedor.Direccion</td>
+                                    <td>
+                                        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModalProveedor" data-id="@proveedor.IdProveedor">Editar</button>
+                                        <button class="btn btn-danger" data-id="@proveedor.IdProveedor" onclick="deleteProveedor(@proveedor.IdProveedor)">Eliminar</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- Categorías Tab -->
             <div class="tab-pane fade" id="categorias" role="tabpanel" aria-labelledby="categorias-tab">
                 <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createModalCategoria">Agregar Categoría</button>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Descripción</th>
-                            <th>Departamento</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var categoria in Model.Categorias)
-                        {
+                <div id="categorias-content">
+                    <table class="table table-striped">
+                        <thead>
                             <tr>
-                                <td>@categoria.IdCategoria</td>
-                                <td>@categoria.Nombre</td>
-                                <td>@categoria.Descripcion</td>
-                                <td>@categoria.IdDepartamentoNavigation?.Nombre</td>
-                                <td>
-                                    <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModalCategoria" data-id="@categoria.IdCategoria">Editar</button>
-                                    <button class="btn btn-danger" onclick="deleteCategoria(@categoria.IdCategoria)">Eliminar</button>
-                                </td>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th>Departamento</th>
+                                <th>Acciones</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach (var categoria in Model.Categorias)
+                            {
+                                <tr>
+                                    <td>@categoria.IdCategoria</td>
+                                    <td>@categoria.Nombre</td>
+                                    <td>@categoria.Descripcion</td>
+                                    <td>@categoria.IdDepartamentoNavigation?.Nombre</td>
+                                    <td>
+                                        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModalCategoria" data-id="@categoria.IdCategoria">Editar</button>
+                                        <button class="btn btn-danger" data-id="@categoria.IdCategoria" onclick="deleteCategoria(@categoria.IdCategoria)">Eliminar</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- Subcategorías Tab -->
             <div class="tab-pane fade" id="subcategorias" role="tabpanel" aria-labelledby="subcategorias-tab">
                 <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createModalSubcategoria">Agregar Subcategoría</button>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Descripción</th>
-                            <th>Categoría</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var subcategoria in Model.Subcategorias)
-                        {
+                <div id="subcategorias-content">
+                    <table class="table table-striped">
+                        <thead>
                             <tr>
-                                <td>@subcategoria.IdSubcategoria</td>
-                                <td>@subcategoria.Nombre</td>
-                                <td>@subcategoria.Descripcion</td>
-                                <td>@subcategoria.IdCategoriaNavigation?.Nombre</td>
-                                <td>
-                                    <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModalSubcategoria" data-id="@subcategoria.IdSubcategoria">Editar</button>
-                                    <button class="btn btn-danger" onclick="deleteSubcategoria(@subcategoria.IdSubcategoria)">Eliminar</button>
-                                </td>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th>Categoría</th>
+                                <th>Acciones</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach (var subcategoria in Model.Subcategorias)
+                            {
+                                <tr>
+                                    <td>@subcategoria.IdSubcategoria</td>
+                                    <td>@subcategoria.Nombre</td>
+                                    <td>@subcategoria.Descripcion</td>
+                                    <td>@subcategoria.IdCategoriaNavigation?.Nombre</td>
+                                    <td>
+                                        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModalSubcategoria" data-id="@subcategoria.IdSubcategoria">Editar</button>
+                                        <button class="btn btn-danger" data-id="@subcategoria.IdSubcategoria" onclick="deleteSubcategoria(@subcategoria.IdSubcategoria)">Eliminar</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- Productos Tab -->
             <div class="tab-pane fade" id="productos" role="tabpanel" aria-labelledby="productos-tab">
                 <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createModalProducto">Agregar Producto</button>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Descripción</th>
-                            <th>Precio</th>
-                            <th>Cantidad</th>
-                            <th>Imagen</th>
-                            <th>Departamento</th>
-                            <th>Categoría</th>
-                            <th>Subcategoría</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var producto in Model.Productos)
-                        {
+                <div id="productos-content">
+                    <table class="table table-striped">
+                        <thead>
                             <tr>
-                                <td>@producto.IdProductos</td>
-                                <td>@producto.Nombre</td>
-                                <td>@producto.DescripcionDelProducto</td>
-                                <td>@producto.Precio</td>
-                                <td>@producto.Cantidad</td>
-                                <td>
-                                    @if (producto.ImagenDelProducto != null)
-                                    {
-                                        <img src="data:image/png;base64,@Convert.ToBase64String(producto.ImagenDelProducto)" width="50" height="50" />
-                                    }
-                                    else
-                                    {
-                                        <img src="~/images/default.png" width="50" height="50" />
-                                    }
-                                </td>
-                                <td>@producto.Departamento?.Nombre</td>
-                                <td>@producto.Categoria?.Nombre</td>
-                                <td>@producto.Subcategoria?.Nombre</td>
-                                <td>
-                                    <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModalProducto" data-id="@producto.IdProductos">Editar</button>
-                                    <button class="btn btn-danger" onclick="deleteProducto(@producto.IdProductos)">Eliminar</button>
-                                </td>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th>Precio</th>
+                                <th>Cantidad</th>
+                                <th>Imagen</th>
+                                <th>DepaID</th>
+                                <th>Departamento</th>
+                                <th>Categoría</th>
+                                <th>Subcategoría</th>
+                                <th>Acciones</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach (var producto in Model.Productos)
+                            {
+                                <tr>
+                                    <td>@producto.IdProductos</td>
+                                    <td>@producto.Nombre</td>
+                                    <td>@producto.DescripcionDelProducto</td>
+                                    <td>@producto.Precio</td>
+                                    <td>@producto.Cantidad</td>
+                                    <td>
+                                        @if (producto.ImagenDelProducto != null)
+                                        {
+                                            <img src="data:image/png;base64,@Convert.ToBase64String(producto.ImagenDelProducto)" width="50" height="50" />
+                                        }
+                                        else
+                                        {
+                                            <img src="~/images/default.png" width="50" height="50" />
+                                        }
+                                    </td>
+                                    <td>@producto.Departamento?.IdDepartamento</td>
+                                    <td>@producto.Departamento?.Nombre</td>
+                                    <td>@producto.Categoria?.Nombre</td>
+                                    <td>@producto.Subcategoria?.Nombre</td>
+                                    <td>
+                                        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModalProducto" data-id="@producto.IdProductos">Editar</button>
+                                        <button class="btn btn-danger" data-id="@producto.IdProductos" onclick="deleteProducto(@producto.IdProductos)">Eliminar</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </main>
@@ -576,10 +588,106 @@
     </div>
 </div>
 
-<footer class="border-top footer text-muted">
-    <div class="container">
-        &copy; 2024 - INNOTEC_Proyect - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+<!-- Toast Message -->
+<div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+        <div class="toast-body">
+            Guardado con éxito.
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
     </div>
-</footer>
+</div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="~/js/Capturista.js"></script>
+<script>
+    $(document).ready(function () {
+        // Función para establecer la pestaña activa en el local storage
+        function setActiveTab(tabName) {
+            localStorage.setItem('activeTab', tabName);
+        }
+
+        // Función para obtener la pestaña activa desde el local storage
+        function getActiveTab() {
+            return localStorage.getItem('activeTab') || '#departamentos';
+        }
+
+        // Mostrar la pestaña activa
+        var activeTab = getActiveTab();
+        $('[data-bs-target="' + activeTab + '"]').tab('show');
+
+        // Establecer la pestaña activa al cambiar de pestaña
+        $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var tabName = $(e.target).data('bs-target');
+            setActiveTab(tabName);
+        });
+
+        // Función para obtener datos y llenar el modal
+        function showEditModal(modalId, button) {
+            var id = button.data('id');
+            var urlMap = {
+                '#editModalDepartamento': '/Capturista/GetDepartamentoById?id=' + id,
+                '#editModalProveedor': '/Capturista/GetProveedorById?id=' + id,
+                '#editModalCategoria': '/Capturista/GetCategoriaById?id=' + id,
+                '#editModalSubcategoria': '/Capturista/GetSubcategoriaById?id=' + id,
+                '#editModalProducto': '/Capturista/GetProductoById?id=' + id
+            };
+            var fieldMap = {
+                '#editModalDepartamento': {
+                    '#editDepartamentoId': 'idDepartamento',
+                    '#editDepartamentoNombre': 'nombre'
+                },
+                '#editModalProveedor': {
+                    '#editProveedorId': 'idProveedor',
+                    '#editProveedorNombre': 'nombre',
+                    '#editProveedorTelefono': 'telefono',
+                    '#editProveedorDireccion': 'direccion'
+                },
+                '#editModalCategoria': {
+                    '#editCategoriaId': 'idCategoria',
+                    '#editCategoriaNombre': 'nombre',
+                    '#editCategoriaDescripcion': 'descripcion',
+                    '#editCategoriaDepartamento': 'idDepartamento'
+                },
+                '#editModalSubcategoria': {
+                    '#editSubcategoriaId': 'idSubcategoria',
+                    '#editSubcategoriaNombre': 'nombre',
+                    '#editSubcategoriaDescripcion': 'descripcion',
+                    '#editSubcategoriaCategoria': 'idCategoria'
+                },
+                '#editModalProducto': {
+                    '#editProductoId': 'idProductos',
+                    '#editProductoNombre': 'nombre',
+                    '#editProductoDescripcion': 'descripcionDelProducto',
+                    '#editProductoPrecio': 'precio',
+                    '#editProductoCantidad': 'cantidad',
+                    '#editProductoDepartamento': 'idDepartamento',
+                    '#editProductoCategoria': 'idCategoria',
+                    '#editProductoSubcategoria': 'idSubcategoria',
+                    '#editProductoProveedor': 'idProveedor'
+                }
+            };
+
+            $.getJSON(urlMap[modalId], function (response) {
+                if (response) {
+                    var fields = fieldMap[modalId];
+                    for (const [key, value] of Object.entries(fields)) {
+                        $(modalId).find(key).val(response[value]);
+                    }
+                } else {
+                    alert('Error al cargar los datos.');
+                }
+            }).fail(function () {
+                alert('Error al cargar los datos.');
+            });
+        }
+
+        // Mostrar modales de edición
+        $('#editModalDepartamento, #editModalProveedor, #editModalCategoria, #editModalSubcategoria, #editModalProducto').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var modalId = '#' + $(this).attr('id');
+            showEditModal(modalId, button);
+        });
+    });
+</script>
+

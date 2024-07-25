@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using ML;
 using INNOTEC_Proyect.Models;
 using Microsoft.Extensions.Configuration;
+using INNOTEC_Proyect.Clases;
+using Newtonsoft.Json;
 
 namespace INNOTEC_Proyect.Controllers
 {
@@ -22,7 +24,7 @@ namespace INNOTEC_Proyect.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Capturista()
+        public async Task<IActionResult> Capturista(string activeTab = "#departamentos-tab")
         {
             var viewModel = new HomeViewModel
             {
@@ -30,7 +32,8 @@ namespace INNOTEC_Proyect.Controllers
                 Categorias = await _httpClient.GetFromJsonAsync<List<Categorium>>("Categoria/GetAll"),
                 Subcategorias = await _httpClient.GetFromJsonAsync<List<Subcategorium>>("Subcategoria/GetAll"),
                 Productos = await _httpClient.GetFromJsonAsync<List<Producto>>("Producto/GetAll"),
-                Proveedores = await _httpClient.GetFromJsonAsync<List<Proveedor>>("Proveedor/GetAll")
+                Proveedores = await _httpClient.GetFromJsonAsync<List<Proveedor>>("Proveedor/GetAll"),
+                ActiveTab = activeTab
             };
 
             return View("~/Views/Admin/Capturista.cshtml", viewModel);
@@ -92,6 +95,7 @@ namespace INNOTEC_Proyect.Controllers
             return Json(new { success = false, message = "Error al agregar el producto" });
         }
 
+
         // Update methods
         [HttpPut]
         public async Task<IActionResult> UpdateDepartamento(int id, [FromBody] Departamento departamento)
@@ -147,6 +151,7 @@ namespace INNOTEC_Proyect.Controllers
             }
             return Json(new { success = false, message = "Error al actualizar el producto" });
         }
+
 
         // Delete methods
         [HttpDelete]
@@ -204,6 +209,7 @@ namespace INNOTEC_Proyect.Controllers
             return Json(new { success = false, message = "Error al eliminar el producto" });
         }
 
+
         // GetById methods
         [HttpGet]
         public async Task<IActionResult> GetDepartamentoById(int id)
@@ -252,12 +258,18 @@ namespace INNOTEC_Proyect.Controllers
         [HttpGet]
         public async Task<IActionResult> GetProductoById(int id)
         {
-            var producto = await _httpClient.GetFromJsonAsync<Producto>($"Producto/GetById?id={id}");
+            var response = await _httpClient.GetStringAsync($"Producto/GetById?id={id}");
+            var settings = new JsonSerializerSettings();
+            settings.Converters.Add(new NestedConverter());
+
+            var producto = JsonConvert.DeserializeObject<Producto>(response, settings);
+
             if (producto != null)
             {
                 return Json(producto);
             }
             return Json(null);
         }
+
     }
 }

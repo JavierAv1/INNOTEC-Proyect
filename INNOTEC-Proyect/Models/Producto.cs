@@ -42,9 +42,10 @@ namespace ML
         public Subcategorium Subcategoria { get; set; }
         public Proveedor Proveedor { get; set; }
 
-        //Extras
+        ////Extras
         public List<Producto> Productos { get; set; }
         public Categorium Categorium { get; set; }
         public Subcategorium Subcategorium { get; set; }
+
     }
 }

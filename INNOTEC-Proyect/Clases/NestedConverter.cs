@@ -24,6 +24,11 @@ namespace INNOTEC_Proyect.Clases
                 int? productQuantity = item["cantidad"]?.ToObject<int?>();
                 byte[] productImage = item["imagenDelProducto"]?.ToObject<byte[]>();
 
+                int departamentoId = item["departamento"]?["id"]?.ToObject<int>() ?? 0;
+                int categoriaId = item["categoria"]?["id"]?.ToObject<int>() ?? 0;
+                int subcategoriaId = item["subcategoria"]?["id"]?.ToObject<int>() ?? 0;
+                int proveedorId = item["proveedor"]?["id"]?.ToObject<int>() ?? 0;
+
                 return new Producto
                 {
                     IdProductos = productId,
@@ -32,6 +37,14 @@ namespace INNOTEC_Proyect.Clases
                     Precio = productPrice,
                     Cantidad = productQuantity,
                     ImagenDelProducto = productImage,
+                    IdDepartamento = departamentoId,
+                    IdCategoria = categoriaId,
+                    IdSubcategoria = subcategoriaId,
+                    IdProveedor = proveedorId,
+                    Departamento = departamentoId != 0 ? new Departamento { IdDepartamento = departamentoId } : null,
+                    Categoria = categoriaId != 0 ? new Categorium { IdCategoria = categoriaId } : null,
+                    Subcategoria = subcategoriaId != 0 ? new Subcategorium { IdSubcategoria = subcategoriaId } : null,
+                    Proveedor = proveedorId != 0 ? new Proveedor { IdProveedor = proveedorId } : null
                 };
             }
             else if (objectType == typeof(Departamento))
@@ -66,9 +79,9 @@ namespace INNOTEC_Proyect.Clases
 
             return null;
 
-
             throw new NotImplementedException("Unrecognized type");
         }
+
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             throw new NotImplementedException("Unneeded because we only read the JSON");
@@ -83,7 +96,4 @@ namespace INNOTEC_Proyect.Clases
             };
         }
     }
-
-
 }
-
