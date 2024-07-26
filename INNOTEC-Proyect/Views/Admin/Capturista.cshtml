@@ -191,7 +191,7 @@
                                             <img src="~/images/default.png" width="50" height="50" />
                                         }
                                     </td>
-                                    <td>@producto.Departamento?.IdDepartamento</td>
+                                    <td>@producto.IdDepartamento</td>
                                     <td>@producto.Departamento?.Nombre</td>
                                     <td>@producto.Categoria?.Nombre</td>
                                     <td>@producto.Subcategoria?.Nombre</td>
@@ -391,6 +391,7 @@
                     </div>
                     <button type="button" class="btn btn-primary" onclick="createProducto()">Guardar</button>
                 </form>
+
             </div>
         </div>
     </div>
@@ -583,6 +584,7 @@
                     </div>
                     <button type="button" class="btn btn-primary" onclick="updateProducto()">Guardar</button>
                 </form>
+
             </div>
         </div>
     </div>
@@ -599,7 +601,8 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="~/js/Capturista.js"></script>
+<script src="~/js/Capturista.js?v=@DateTime.Now.Ticks"></script>
+
 <script>
     $(document).ready(function () {
         // Función para establecer la pestaña activa en el local storage

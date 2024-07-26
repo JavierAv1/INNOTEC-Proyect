@@ -85,8 +85,17 @@ namespace INNOTEC_Proyect.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateProducto([FromBody] Producto producto)
+        public async Task<IActionResult> CreateProducto([FromForm] ML.Producto producto, IFormFile ImagenDelProducto)
         {
+            if (ImagenDelProducto != null && ImagenDelProducto.Length > 0)
+            {
+                using (var ms = new MemoryStream())
+                {
+                    await ImagenDelProducto.CopyToAsync(ms);
+                    producto.ImagenDelProducto = ms.ToArray();
+                }
+            }
+
             var response = await _httpClient.PostAsJsonAsync("Producto/Insert", producto);
             if (response.IsSuccessStatusCode)
             {
@@ -94,6 +103,7 @@ namespace INNOTEC_Proyect.Controllers
             }
             return Json(new { success = false, message = "Error al agregar el producto" });
         }
+
 
 
         // Update methods
@@ -141,9 +151,18 @@ namespace INNOTEC_Proyect.Controllers
             return Json(new { success = false, message = "Error al actualizar la subcategoría" });
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateProducto(int id, [FromBody] Producto producto)
+        [HttpPost]  // Cambiar a POST para manejar multipart/form-data
+        public async Task<IActionResult> UpdateProducto(int id, [FromForm] ML.Producto producto, IFormFile ImagenDelProducto)
         {
+            if (ImagenDelProducto != null && ImagenDelProducto.Length > 0)
+            {
+                using (var ms = new MemoryStream())
+                {
+                    await ImagenDelProducto.CopyToAsync(ms);
+                    producto.ImagenDelProducto = ms.ToArray();
+                }
+            }
+
             var response = await _httpClient.PutAsJsonAsync($"Producto/Update?id={id}", producto);
             if (response.IsSuccessStatusCode)
             {
@@ -151,7 +170,6 @@ namespace INNOTEC_Proyect.Controllers
             }
             return Json(new { success = false, message = "Error al actualizar el producto" });
         }
-
 
         // Delete methods
         [HttpDelete]

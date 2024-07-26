@@ -7,6 +7,28 @@
         return localStorage.getItem('activeTab') || '#departamentos-tab';
     }
 
+    function showToastMessage(message) {
+        var toastElement = $('#successToast');
+        toastElement.find('.toast-body').text(message);
+        var toast = new bootstrap.Toast(toastElement);
+        toast.show();
+    }
+
+    function refreshPage(message) {
+        if (message) {
+            localStorage.setItem('toastMessage', message);
+        }
+        location.reload();
+    }
+
+    function checkForToastMessage() {
+        var message = localStorage.getItem('toastMessage');
+        if (message) {
+            showToastMessage(message);
+            localStorage.removeItem('toastMessage');
+        }
+    }
+
     var activeTab = getActiveTab();
     $('[href="' + activeTab + '"]').tab('show');
 
@@ -111,13 +133,6 @@
         }
     }
 
-    function showToastMessage(message) {
-        var toastElement = $('#successToast');
-        toastElement.find('.toast-body').text(message);
-        var toast = new bootstrap.Toast(toastElement);
-        toast.show();
-    }
-
     function refreshTabContent(tab) {
         var tabUrlMap = {
             '#departamentos-tab': '/Capturista/GetDepartamentos',
@@ -151,7 +166,7 @@
                 if (response.success) {
                     closeModal(modalId);
                     showToastMessage(successMessage);
-                    refreshTabContent(getActiveTab());
+                    refreshPage(successMessage);
                 } else {
                     alert(response.message);
                 }
@@ -226,7 +241,7 @@
                 if (response.success) {
                     $('#createModalDepartamento').modal('hide');
                     showToastMessage('Departamento agregado con éxito');
-                    refreshPage();
+                    refreshPage('Departamento agregado con éxito');
                 } else {
                     alert(response.message);
                 }
@@ -234,12 +249,51 @@
         });
     };
 
+
+    window.createProducto = function () {
+        var formData = new FormData();
+        formData.append('Nombre', $('#createProductoNombre').val());
+        formData.append('DescripcionDelProducto', $('#createProductoDescripcion').val());
+        formData.append('Precio', $('#createProductoPrecio').val());
+        formData.append('Cantidad', $('#createProductoCantidad').val());
+        formData.append('IdDepartamento', $('#createProductoDepartamento').val());
+        formData.append('IdCategoria', $('#createProductoCategoria').val());
+        formData.append('IdSubcategoria', $('#createProductoSubcategoria').val());
+        formData.append('IdProveedor', $('#createProductoProveedor').val());
+
+        // Si hay un archivo seleccionado
+        var fileInput = $('#createProductoImagen')[0];
+        if (fileInput.files.length > 0) {
+            formData.append('ImagenDelProducto', fileInput.files[0]);
+        }
+
+        $.ajax({
+            url: '/Capturista/CreateProducto',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.success) {
+                    location.reload();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function (xhr) {
+                alert('Error al agregar el producto: ' + xhr.responseText);
+            }
+        });
+    };
+
+
     window.createProveedor = function () {
         var data = {
             Nombre: $('#createProveedorNombre').val(),
             Telefono: $('#createProveedorTelefono').val(),
             Direccion: $('#createProveedorDireccion').val()
         };
+        console.log(data);
         $.ajax({
             type: 'POST',
             url: '/Capturista/CreateProveedor',
@@ -249,7 +303,7 @@
                 if (response.success) {
                     $('#createModalProveedor').modal('hide');
                     showToastMessage('Proveedor agregado con éxito');
-                    refreshPage();
+                    refreshPage('Proveedor agregado con éxito');
                 } else {
                     alert(response.message);
                 }
@@ -272,7 +326,7 @@
                 if (response.success) {
                     $('#createModalCategoria').modal('hide');
                     showToastMessage('Categoría agregada con éxito');
-                    refreshPage();
+                    refreshPage('Categoría agregada con éxito');
                 } else {
                     alert(response.message);
                 }
@@ -295,27 +349,7 @@
                 if (response.success) {
                     $('#createModalSubcategoria').modal('hide');
                     showToastMessage('Subcategoría agregada con éxito');
-                    refreshPage();
-                } else {
-                    alert(response.message);
-                }
-            }
-        });
-    };
-
-    window.createProducto = function () {
-        var formData = new FormData($('#createFormProducto')[0]);
-        $.ajax({
-            type: 'POST',
-            url: '/Capturista/CreateProducto',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (response) {
-                if (response.success) {
-                    $('#createModalProducto').modal('hide');
-                    showToastMessage('Producto agregado con éxito');
-                    refreshPage();
+                    refreshPage('Subcategoría agregada con éxito');
                 } else {
                     alert(response.message);
                 }
@@ -338,7 +372,7 @@
                 if (response.success) {
                     $('#editModalDepartamento').modal('hide');
                     showToastMessage('Departamento actualizado con éxito');
-                    refreshPage();
+                    refreshPage('Departamento actualizado con éxito');
                 } else {
                     alert(response.message);
                 }
@@ -362,7 +396,7 @@
                 if (response.success) {
                     $('#editModalProveedor').modal('hide');
                     showToastMessage('Proveedor actualizado con éxito');
-                    refreshPage();
+                    refreshPage('Proveedor actualizado con éxito');
                 } else {
                     alert(response.message);
                 }
@@ -386,7 +420,7 @@
                 if (response.success) {
                     $('#editModalCategoria').modal('hide');
                     showToastMessage('Categoría actualizada con éxito');
-                    refreshPage();
+                    refreshPage('Categoría actualizada con éxito');
                 } else {
                     alert(response.message);
                 }
@@ -410,7 +444,7 @@
                 if (response.success) {
                     $('#editModalSubcategoria').modal('hide');
                     showToastMessage('Subcategoría actualizada con éxito');
-                    refreshPage();
+                    refreshPage('Subcategoría actualizada con éxito');
                 } else {
                     alert(response.message);
                 }
@@ -421,7 +455,7 @@
     window.updateProducto = function () {
         var formData = new FormData($('#editFormProducto')[0]);
         $.ajax({
-            type: 'PUT',
+            type: 'POST',  // Cambiar a POST para que sea compatible con FormData y ASP.NET
             url: '/Capturista/UpdateProducto?id=' + formData.get('IdProductos'),
             data: formData,
             processData: false,
@@ -430,14 +464,16 @@
                 if (response.success) {
                     $('#editModalProducto').modal('hide');
                     showToastMessage('Producto actualizado con éxito');
-                    refreshPage();
+                    refreshPage('Producto actualizado con éxito');
                 } else {
                     alert(response.message);
                 }
+            },
+            error: function (xhr) {
+                alert('Error al actualizar el producto: ' + xhr.responseText);
             }
         });
     };
-
 
 
     // Funciones para eliminar registros
@@ -448,7 +484,7 @@
             success: function (response) {
                 if (response.success) {
                     showToastMessage(successMessage);
-                    refreshTabContent(getActiveTab());
+                    refreshPage(successMessage);
                 } else {
                     alert(response.message);
                 }
@@ -486,15 +522,7 @@
         }
     };
 
-    // Mostrar mensaje de éxito
-    function showToastMessage(message) {
-        $('#successToast .toast-body').text(message);
-        $('#successToast').toast('show');
-    }
-
-    // Refrescar la página después de una operación exitosa
-    function refreshPage() {
-        location.reload();
-    }
-
+    // Check for any toast messages to show on page load
+    checkForToastMessage();
 });
+
