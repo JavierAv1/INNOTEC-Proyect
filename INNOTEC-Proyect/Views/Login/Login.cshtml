@@ -29,16 +29,6 @@
                                 <form id="loginForm" method="post" action="/Login/Login">
                                     <p id="formTitle">Please login to your account</p>
 
-                                    <div class="form-outline mb-4" id="userNameOrEmailDiv">
-                                        <input type="text" id="userNameOrEmail" name="userNameOrEmail" class="form-control" placeholder="Username or Email" required />
-                                        <label class="form-label" for="userNameOrEmail">Username or Email</label>
-                                    </div>
-
-                                    <div class="form-outline mb-4">
-                                        <input type="password" id="Contraseña" name="Contraseña" class="form-control" required />
-                                        <label class="form-label" for="Contraseña">Password</label>
-                                    </div>
-
                                     <div id="extraFields" style="display: none;">
                                         <div class="form-outline mb-4">
                                             <input type="text" id="userName" name="userName" class="form-control" placeholder="Username" />
@@ -76,6 +66,16 @@
                                             <input type="text" id="cell" name="Celular" class="form-control" placeholder="Cell (optional)" />
                                             <label class="form-label" for="cell">Cell</label>
                                         </div>
+                                    </div>
+
+                                    <div class="form-outline mb-4" id="userNameOrEmailDiv">
+                                        <input type="text" id="userNameOrEmail" name="userNameOrEmail" class="form-control" placeholder="Username or Email" required />
+                                        <label class="form-label" for="userNameOrEmail">Username or Email</label>
+                                    </div>
+
+                                    <div class="form-outline mb-4" id="passwordDiv">
+                                        <input type="password" id="Contraseña" name="Contraseña" class="form-control" required />
+                                        <label class="form-label" for="Contraseña">Password</label>
                                     </div>
 
                                     <div class="text-center pt-1 mb-5 pb-1">
@@ -116,6 +116,7 @@
         const toggleButton = document.getElementById('toggleButton');
         const userNameOrEmailDiv = document.getElementById('userNameOrEmailDiv');
         const extraFields = document.getElementById('extraFields');
+        const passwordDiv = document.getElementById('passwordDiv');
 
         toggleButton.addEventListener('click', function () {
             const isLogin = submitButton.textContent === 'Log in';
@@ -125,8 +126,11 @@
             toggleButton.textContent = isLogin ? 'Login' : 'Create new';
 
             userNameOrEmailDiv.style.display = isLogin ? 'none' : 'block';
+            passwordDiv.style.display = 'block';
             extraFields.style.display = isLogin ? 'block' : 'none';
 
+            document.getElementById('userNameOrEmail').disabled = !isLogin;
+            document.getElementById('userNameOrEmail').required = !isLogin;
             document.getElementById('userName').required = isLogin;
             document.getElementById('email').required = isLogin;
             document.getElementById('firstName').required = isLogin;
