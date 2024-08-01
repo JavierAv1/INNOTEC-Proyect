@@ -22,4 +22,6 @@ public partial class Compra
     public virtual Producto? IdproductoNavigation { get; set; }
 
     public virtual Usuario? IdusuarioNavigation { get; set; }
+
+    public ICollection<Pedido>? Pedidos { get; set; }
 }

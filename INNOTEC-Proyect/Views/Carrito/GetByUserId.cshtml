@@ -34,7 +34,8 @@
                     </div>
                     <div class="col-md-4 align-items-center align-content-center">
                         <div class="d-flex flex-row align-items-center">
-                            <h4 class="mr-1">$@item.IdproductoNavigation?.Precio</h4>
+                            <h4 class="mr-1">$@(item.IdproductoNavigation?.Precio * item.Cantidad)</h4>
+
                         </div>
                         <div class="d-flex flex-column mt-4">
                             <input type="hidden" class="form-control idusuario" value="@User.FindFirstValue("UserId")" />
@@ -42,7 +43,7 @@
                             <input type="hidden" class="form-control idcompra" value="@item.IdCompra" />
                             <input type="number" class="form-control mb-2 cantidad" value="@item.Cantidad" data-id="@item.IdCompra" min="1" />
                             <button class="btn btn-outline-danger btn-sm eliminar-btn" type="button" data-id="@item.IdCompra">Eliminar</button>
-                            <button class="btn btn-outline-primary btn-sm mt-2 comprar-btn" type="button" data-id="@item.IdCompra">Comprar ahora</button>
+                            <button class="btn btn-outline-primary btn-sm mt-2 comprar-btn" type="button" data-id="@item.IdCompra" data-total=@(item.IdproductoNavigation?.Precio * item.Cantidad)>Comprar ahora</button>
                         </div>
                     </div>
                 </div>
@@ -54,8 +55,8 @@
                     <h5 class="card-title">Resumen de compra</h5>
                     <p class="card-text">Total productos: @Model.Count</p>
                     <p class="card-text">Envío: Gratis</p>
-                    <p class="card-text">Total: $@Model.Sum(item => item.IdproductoNavigation?.Precio * item.Cantidad)</p>
-                    <button class="btn btn-primary btn-block">Continuar compra</button>
+                    <p class="card-text">Total: $<span id="total-compra">@Model.Sum(item => item.IdproductoNavigation?.Precio * item.Cantidad)</span></p>
+                    <button id="continuar-compra" class="btn btn-primary btn-block">Continuar compra</button>
                 </div>
             </div>
         </div>
@@ -83,7 +84,7 @@
                 };
 
                 $.ajax({
-                    url: '@Url.Action("Update", "Carrito")',
+                    url: '/Carrito/Update',
                     type: 'PUT',
                     contentType: 'application/json',
                     data: JSON.stringify(compra),
@@ -105,7 +106,7 @@
                 var id = $(this).data('id');
 
                 $.ajax({
-                    url: '@Url.Action("Delete", "Carrito")/' + id,
+                    url: '/Carrito/Delete/' + id,
                     type: 'DELETE',
                     success: function (response) {
                         if (response.success) {
@@ -122,10 +123,25 @@
             });
 
             $('.comprar-btn').on('click', function () {
-                var id = $(this).data('id');
-                window.location.href = '@Url.Action("Comprar", "Carrito")?id=' + id;
+                var idCompra = $(this).data('id');
+                var total = $(this).data('total');
+                var url = '/Envio/Index?idCompra=' + encodeURIComponent(idCompra) + '&total=' + encodeURIComponent(total);
+                window.location.href = url;
+            });
+
+            $('#continuar-compra').on('click', function () {
+                var idsCompra = [];
+                var totalCompra = 0;
+
+                $('.idcompra').each(function () {
+                    idsCompra.push($(this).val());
+                });
+
+                totalCompra = parseFloat($('#total-compra').text());
+
+                var url = '/Envio/Index?idsCompra=' + encodeURIComponent(idsCompra.join(',')) + '&total=' + encodeURIComponent(totalCompra);
+                window.location.href = url;
             });
         });
     </script>
 }
-

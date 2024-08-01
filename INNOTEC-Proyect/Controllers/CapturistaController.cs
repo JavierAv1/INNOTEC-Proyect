@@ -8,6 +8,7 @@ using INNOTEC_Proyect.Models;
 using Microsoft.Extensions.Configuration;
 using INNOTEC_Proyect.Clases;
 using Newtonsoft.Json;
+using System.Text;
 
 namespace INNOTEC_Proyect.Controllers
 {
@@ -151,7 +152,7 @@ namespace INNOTEC_Proyect.Controllers
             return Json(new { success = false, message = "Error al actualizar la subcategoría" });
         }
 
-        [HttpPost]  // Cambiar a POST para manejar multipart/form-data
+        [HttpPost]
         public async Task<IActionResult> UpdateProducto(int id, [FromForm] ML.Producto producto, IFormFile ImagenDelProducto)
         {
             if (ImagenDelProducto != null && ImagenDelProducto.Length > 0)
@@ -163,14 +164,17 @@ namespace INNOTEC_Proyect.Controllers
                 }
             }
 
-            var response = await _httpClient.PutAsJsonAsync($"Producto/Update?id={id}", producto);
+            // Convertir el producto en un objeto JSON
+            var productoJson = JsonConvert.SerializeObject(producto);
+            var httpContent = new StringContent(productoJson, Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PostAsync($"Producto/Update?id={id}", httpContent);
             if (response.IsSuccessStatusCode)
             {
                 return Json(new { success = true });
             }
             return Json(new { success = false, message = "Error al actualizar el producto" });
         }
-
         // Delete methods
         [HttpDelete]
         public async Task<IActionResult> DeleteDepartamento(int id)

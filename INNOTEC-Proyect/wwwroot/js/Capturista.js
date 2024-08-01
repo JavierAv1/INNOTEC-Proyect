@@ -1,12 +1,15 @@
 ﻿$(document).ready(function () {
+    // Función para establecer la pestaña activa en el local storage
     function setActiveTab(tabName) {
         localStorage.setItem('activeTab', tabName);
     }
 
+    // Función para obtener la pestaña activa desde el local storage
     function getActiveTab() {
         return localStorage.getItem('activeTab') || '#departamentos-tab';
     }
 
+    // Función para mostrar mensajes de toast
     function showToastMessage(message) {
         var toastElement = $('#successToast');
         toastElement.find('.toast-body').text(message);
@@ -14,6 +17,7 @@
         toast.show();
     }
 
+    // Función para refrescar la página
     function refreshPage(message) {
         if (message) {
             localStorage.setItem('toastMessage', message);
@@ -21,6 +25,7 @@
         location.reload();
     }
 
+    // Función para revisar mensajes de toast almacenados
     function checkForToastMessage() {
         var message = localStorage.getItem('toastMessage');
         if (message) {
@@ -29,14 +34,17 @@
         }
     }
 
+    // Mostrar la pestaña activa
     var activeTab = getActiveTab();
-    $('[href="' + activeTab + '"]').tab('show');
+    $('[data-bs-target="' + activeTab + '"]').tab('show');
 
-    $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
-        var tabName = $(e.target).attr('href');
+    // Establecer la pestaña activa al cambiar de pestaña
+    $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+        var tabName = $(e.target).data('bs-target');
         setActiveTab(tabName);
     });
 
+    // Función para obtener datos y llenar el modal
     function fetchDataAndPopulateModal(url, fields, modalId) {
         $.getJSON(url, function (response) {
             if (response) {
@@ -51,111 +59,19 @@
         });
     }
 
-    $('#editModalDepartamento').on('show.bs.modal', function (event) {
-        var button = $(event.relatedTarget);
-        var id = button.data('id');
-        var url = `/Capturista/GetDepartamentoById?id=${id}`;
-        var fields = {
-            '#editDepartamentoId': 'idDepartamento',
-            '#editDepartamentoNombre': 'nombre'
-        };
-        fetchDataAndPopulateModal(url, fields, '#editModalDepartamento');
-    });
-
-    $('#editModalProveedor').on('show.bs.modal', function (event) {
-        var button = $(event.relatedTarget);
-        var id = button.data('id');
-        var url = `/Capturista/GetProveedorById?id=${id}`;
-        var fields = {
-            '#editProveedorId': 'idProveedor',
-            '#editProveedorNombre': 'nombre',
-            '#editProveedorTelefono': 'telefono',
-            '#editProveedorDireccion': 'direccion'
-        };
-        fetchDataAndPopulateModal(url, fields, '#editModalProveedor');
-    });
-
-    $('#editModalCategoria').on('show.bs.modal', function (event) {
-        var button = $(event.relatedTarget);
-        var id = button.data('id');
-        var url = `/Capturista/GetCategoriaById?id=${id}`;
-        var fields = {
-            '#editCategoriaId': 'idCategoria',
-            '#editCategoriaNombre': 'nombre',
-            '#editCategoriaDescripcion': 'descripcion',
-            '#editCategoriaDepartamento': 'idDepartamento'
-        };
-        fetchDataAndPopulateModal(url, fields, '#editModalCategoria');
-    });
-
-    $('#editModalSubcategoria').on('show.bs.modal', function (event) {
-        var button = $(event.relatedTarget);
-        var id = button.data('id');
-        var url = `/Capturista/GetSubcategoriaById?id=${id}`;
-        var fields = {
-            '#editSubcategoriaId': 'idSubcategoria',
-            '#editSubcategoriaNombre': 'nombre',
-            '#editSubcategoriaDescripcion': 'descripcion',
-            '#editSubcategoriaCategoria': 'idCategoria'
-        };
-        fetchDataAndPopulateModal(url, fields, '#editModalSubcategoria');
-    });
-
-    $('#editModalProducto').on('show.bs.modal', function (event) {
-        var button = $(event.relatedTarget);
-        var id = button.data('id');
-        var url = `/Capturista/GetProductoById?id=${id}`;
-        $.getJSON(url, function (response) {
-            if (response) {
-                var fields = {
-                    '#editProductoId': 'idProductos',
-                    '#editProductoNombre': 'nombre',
-                    '#editProductoDescripcion': 'descripcionDelProducto',
-                    '#editProductoPrecio': 'precio',
-                    '#editProductoCantidad': 'cantidad'
-                };
-                populateModalFields(response, fields, '#editModalProducto');
-                $('#editProductoDepartamento').val(response.departamento?.idDepartamento || null);
-                $('#editProductoCategoria').val(response.categoria?.idCategoria || null);
-                $('#editProductoSubcategoria').val(response.subcategoria?.idSubcategoria || null);
-                $('#editProductoProveedor').val(response.proveedor?.idProveedor || null);
-            } else {
-                alert('Error al cargar los datos.');
-            }
-        }).fail(function () {
-            alert('Error al cargar los datos.');
-        });
-    });
-
+    // Función para llenar campos del modal
     function populateModalFields(data, fields, modalId) {
         for (const [key, value] of Object.entries(fields)) {
             $(modalId).find(key).val(data[value]);
         }
     }
 
-    function refreshTabContent(tab) {
-        var tabUrlMap = {
-            '#departamentos-tab': '/Capturista/GetDepartamentos',
-            '#proveedores-tab': '/Capturista/GetProveedores',
-            '#categorias-tab': '/Capturista/GetCategorias',
-            '#subcategorias-tab': '/Capturista/GetSubcategorias',
-            '#productos-tab': '/Capturista/GetProductos'
-        };
-
-        var url = tabUrlMap[tab];
-        if (url) {
-            $.get(url, function (data) {
-                var contentId = tab.replace('-tab', '-content');
-                $(contentId).html(data);
-                showToastMessage('Guardado con éxito.');
-            });
-        }
-    }
-
+    // Función para cerrar el modal
     function closeModal(modalId) {
         $(modalId).modal('hide');
     }
 
+    // Función para manejar el envío de formularios AJAX
     function ajaxFormSubmit(url, data, modalId, successMessage) {
         $.ajax({
             type: 'POST',
@@ -174,7 +90,313 @@
         });
     }
 
+    // Definimos las funciones en el ámbito global
+    window.createDepartamento = function () {
+        var data = {
+            Nombre: $('#createDepartamentoNombre').val()
+        };
+        ajaxFormSubmit('/Capturista/CreateDepartamento', data, '#createModalDepartamento', 'Departamento agregado con éxito');
+    }
 
+    window.createProveedor = function () {
+        var data = {
+            Nombre: $('#createProveedorNombre').val(),
+            Telefono: $('#createProveedorTelefono').val(),
+            Direccion: $('#createProveedorDireccion').val()
+        };
+        ajaxFormSubmit('/Capturista/CreateProveedor', data, '#createModalProveedor', 'Proveedor agregado con éxito');
+    }
+
+    window.createCategoria = function () {
+        var data = {
+            Nombre: $('#createCategoriaNombre').val(),
+            Descripcion: $('#createCategoriaDescripcion').val(),
+            IdDepartamento: $('#createCategoriaDepartamento').val()
+        };
+        ajaxFormSubmit('/Capturista/CreateCategoria', data, '#createModalCategoria', 'Categoría agregada con éxito');
+    }
+
+    window.createSubcategoria = function () {
+        var data = {
+            Nombre: $('#createSubcategoriaNombre').val(),
+            Descripcion: $('#createSubcategoriaDescripcion').val(),
+            IdCategoria: $('#createSubcategoriaCategoria').val()
+        };
+        ajaxFormSubmit('/Capturista/CreateSubcategoria', data, '#createModalSubcategoria', 'Subcategoría agregada con éxito');
+    }
+
+    window.updateProducto = function () {
+        var formData = new FormData($('#editFormProducto')[0]);
+
+        formData.append('IdProductos', $('#editProductoId').val());
+        formData.append('Nombre', $('#editProductoNombre').val());
+        formData.append('DescripcionDelProducto', $('#editProductoDescripcion').val());
+        formData.append('Precio', $('#editProductoPrecio').val());
+        formData.append('Cantidad', $('#editProductoCantidad').val());
+        formData.append('IdDepartamento', $('#editProductoDepartamento').val());
+        formData.append('IdCategoria', $('#editProductoCategoria').val());
+        formData.append('IdSubcategoria', $('#editProductoSubcategoria').val());
+        formData.append('IdProveedor', $('#editProductoProveedor').val());
+
+        // Si hay un archivo seleccionado
+        var fileInput = $('#editProductoImagen')[0];
+        if (fileInput.files.length > 0) {
+            formData.append('ImagenDelProducto', fileInput.files[0]);
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '/Capturista/UpdateProducto?id=' + formData.get('IdProductos'),
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                console.log("Response from server:", response);
+                if (response.success) {
+                    closeModal('#editModalProducto');
+                    showToastMessage('Producto actualizado con éxito');
+                    refreshPage('Producto actualizado con éxito');
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function (xhr) {
+                console.error('Error al actualizar el producto:', xhr);
+                alert('Error al actualizar el producto: ' + xhr.responseText);
+            }
+        });
+    }
+
+
+    window.updateDepartamento = function () {
+        var data = {
+            IdDepartamento: $('#editDepartamentoId').val(),
+            Nombre: $('#editDepartamentoNombre').val()
+        };
+        $.ajax({
+            type: 'PUT',
+            url: '/Capturista/UpdateDepartamento?id=' + data.IdDepartamento,
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(data),
+            success: function (response) {
+                if (response.success) {
+                    closeModal('#editModalDepartamento');
+                    showToastMessage('Departamento actualizado con éxito');
+                    refreshPage('Departamento actualizado con éxito');
+                } else {
+                    alert(response.message);
+                }
+            }
+        });
+    }
+
+    window.updateProveedor = function () {
+        var data = {
+            IdProveedor: $('#editProveedorId').val(),
+            Nombre: $('#editProveedorNombre').val(),
+            Telefono: $('#editProveedorTelefono').val(),
+            Direccion: $('#editProveedorDireccion').val()
+        };
+        $.ajax({
+            type: 'PUT',
+            url: '/Capturista/UpdateProveedor?id=' + data.IdProveedor,
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(data),
+            success: function (response) {
+                if (response.success) {
+                    closeModal('#editModalProveedor');
+                    showToastMessage('Proveedor actualizado con éxito');
+                    refreshPage('Proveedor actualizado con éxito');
+                } else {
+                    alert(response.message);
+                }
+            }
+        });
+    }
+
+    window.updateCategoria = function () {
+        var data = {
+            IdCategoria: $('#editCategoriaId').val(),
+            Nombre: $('#editCategoriaNombre').val(),
+            Descripcion: $('#editCategoriaDescripcion').val(),
+            IdDepartamento: $('#editCategoriaDepartamento').val()
+        };
+        $.ajax({
+            type: 'PUT',
+            url: '/Capturista/UpdateCategoria?id=' + data.IdCategoria,
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(data),
+            success: function (response) {
+                if (response.success) {
+                    closeModal('#editModalCategoria');
+                    showToastMessage('Categoría actualizada con éxito');
+                    refreshPage('Categoría actualizada con éxito');
+                } else {
+                    alert(response.message);
+                }
+            }
+        });
+    }
+
+    window.updateSubcategoria = function () {
+        var data = {
+            IdSubcategoria: $('#editSubcategoriaId').val(),
+            Nombre: $('#editSubcategoriaNombre').val(),
+            Descripcion: $('#editSubcategoriaDescripcion').val(),
+            IdCategoria: $('#editSubcategoriaCategoria').val()
+        };
+        $.ajax({
+            type: 'PUT',
+            url: '/Capturista/UpdateSubcategoria?id=' + data.IdSubcategoria,
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(data),
+            success: function (response) {
+                if (response.success) {
+                    closeModal('#editModalSubcategoria');
+                    showToastMessage('Subcategoría actualizada con éxito');
+                    refreshPage('Subcategoría actualizada con éxito');
+                } else {
+                    alert(response.message);
+                }
+            }
+        });
+    }
+
+    window.updateProducto = function () {
+        var formData = new FormData($('#editFormProducto')[0]);
+        console.log("Updating product with ID:", formData.get('IdProductos'));
+
+        $.ajax({
+            type: 'POST',
+            url: '/Capturista/UpdateProducto?id=' + formData.get('IdProductos'),
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                console.log("Response from server:", response);
+                if (response.success) {
+                    closeModal('#editModalProducto');
+                    showToastMessage('Producto actualizado con éxito');
+                    refreshPage('Producto actualizado con éxito');
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function (xhr) {
+                console.error('Error al actualizar el producto:', xhr);
+                alert('Error al actualizar el producto: ' + xhr.responseText);
+            }
+        });
+    }
+
+
+    // Mostrar modales de edición
+    $('#editModalDepartamento, #editModalProveedor, #editModalCategoria, #editModalSubcategoria, #editModalProducto').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var modalId = '#' + $(this).attr('id');
+        var id = button.data('id');
+        var urlMap = {
+            '#editModalDepartamento': '/Capturista/GetDepartamentoById?id=' + id,
+            '#editModalProveedor': '/Capturista/GetProveedorById?id=' + id,
+            '#editModalCategoria': '/Capturista/GetCategoriaById?id=' + id,
+            '#editModalSubcategoria': '/Capturista/GetSubcategoriaById?id=' + id,
+            '#editModalProducto': '/Capturista/GetProductoById?id=' + id
+        };
+        var fieldMap = {
+            '#editModalDepartamento': {
+                '#editDepartamentoId': 'idDepartamento',
+                '#editDepartamentoNombre': 'nombre'
+            },
+            '#editModalProveedor': {
+                '#editProveedorId': 'idProveedor',
+                '#editProveedorNombre': 'nombre',
+                '#editProveedorTelefono': 'telefono',
+                '#editProveedorDireccion': 'direccion'
+            },
+            '#editModalCategoria': {
+                '#editCategoriaId': 'idCategoria',
+                '#editCategoriaNombre': 'nombre',
+                '#editCategoriaDescripcion': 'descripcion',
+                '#editCategoriaDepartamento': 'idDepartamento'
+            },
+            '#editModalSubcategoria': {
+                '#editSubcategoriaId': 'idSubcategoria',
+                '#editSubcategoriaNombre': 'nombre',
+                '#editSubcategoriaDescripcion': 'descripcion',
+                '#editSubcategoriaCategoria': 'idCategoria'
+            },
+            '#editModalProducto': {
+                '#editProductoId': 'idProductos',
+                '#editProductoNombre': 'nombre',
+                '#editProductoDescripcion': 'descripcionDelProducto',
+                '#editProductoPrecio': 'precio',
+                '#editProductoCantidad': 'cantidad',
+                '#editProductoDepartamento': 'idDepartamento',
+                '#editProductoCategoria': 'idCategoria',
+                '#editProductoSubcategoria': 'idSubcategoria',
+                '#editProductoProveedor': 'idProveedor'
+            }
+        };
+
+        $.getJSON(urlMap[modalId], function (response) {
+            if (response) {
+                var fields = fieldMap[modalId];
+                for (const [key, value] of Object.entries(fields)) {
+                    $(modalId).find(key).val(response[value]);
+                }
+            } else {
+                alert('Error al cargar los datos.');
+            }
+        }).fail(function () {
+            alert('Error al cargar los datos.');
+        });
+    });
+
+    // Funciones para eliminar registros
+    function ajaxDelete(url, successMessage) {
+        $.ajax({
+            type: 'DELETE',
+            url: url,
+            success: function (response) {
+                if (response.success) {
+                    showToastMessage(successMessage);
+                    refreshPage(successMessage);
+                } else {
+                    alert(response.message);
+                }
+            }
+        });
+    }
+
+    window.deleteDepartamento = function (id) {
+        if (confirm('¿Estás seguro de que deseas eliminar este departamento?')) {
+            ajaxDelete('/Capturista/DeleteDepartamento?id=' + id, 'Departamento eliminado con éxito');
+        }
+    };
+
+    window.deleteProveedor = function (id) {
+        if (confirm('¿Estás seguro de que deseas eliminar este proveedor?')) {
+            ajaxDelete('/Capturista/DeleteProveedor?id=' + id, 'Proveedor eliminado con éxito');
+        }
+    };
+
+    window.deleteCategoria = function (id) {
+        if (confirm('¿Estás seguro de que deseas eliminar esta categoría?')) {
+            ajaxDelete('/Capturista/DeleteCategoria?id=' + id, 'Categoría eliminada con éxito');
+        }
+    };
+
+    window.deleteSubcategoria = function (id) {
+        if (confirm('¿Estás seguro de que deseas eliminar esta subcategoría?')) {
+            ajaxDelete('/Capturista/DeleteSubcategoria?id=' + id, 'Subcategoría eliminada con éxito');
+        }
+    };
+
+    window.deleteProducto = function (id) {
+        if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
+            ajaxDelete('/Capturista/DeleteProducto?id=' + id, 'Producto eliminado con éxito');
+        }
+    };
 
     // Event listeners for form submissions
     $('#createFormDepartamento').on('submit', function (e) {
@@ -227,302 +449,6 @@
         updateProducto();
     });
 
-    // Functions to handle CRUD operations
-    window.createDepartamento = function () {
-        var data = {
-            Nombre: $('#createDepartamentoNombre').val()
-        };
-        $.ajax({
-            type: 'POST',
-            url: '/Capturista/CreateDepartamento',
-            contentType: 'application/json; charset=utf-8',
-            data: JSON.stringify(data),
-            success: function (response) {
-                if (response.success) {
-                    $('#createModalDepartamento').modal('hide');
-                    showToastMessage('Departamento agregado con éxito');
-                    refreshPage('Departamento agregado con éxito');
-                } else {
-                    alert(response.message);
-                }
-            }
-        });
-    };
-
-
-    window.createProducto = function () {
-        var formData = new FormData();
-        formData.append('Nombre', $('#createProductoNombre').val());
-        formData.append('DescripcionDelProducto', $('#createProductoDescripcion').val());
-        formData.append('Precio', $('#createProductoPrecio').val());
-        formData.append('Cantidad', $('#createProductoCantidad').val());
-        formData.append('IdDepartamento', $('#createProductoDepartamento').val());
-        formData.append('IdCategoria', $('#createProductoCategoria').val());
-        formData.append('IdSubcategoria', $('#createProductoSubcategoria').val());
-        formData.append('IdProveedor', $('#createProductoProveedor').val());
-
-        // Si hay un archivo seleccionado
-        var fileInput = $('#createProductoImagen')[0];
-        if (fileInput.files.length > 0) {
-            formData.append('ImagenDelProducto', fileInput.files[0]);
-        }
-
-        $.ajax({
-            url: '/Capturista/CreateProducto',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (response) {
-                if (response.success) {
-                    location.reload();
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function (xhr) {
-                alert('Error al agregar el producto: ' + xhr.responseText);
-            }
-        });
-    };
-
-
-    window.createProveedor = function () {
-        var data = {
-            Nombre: $('#createProveedorNombre').val(),
-            Telefono: $('#createProveedorTelefono').val(),
-            Direccion: $('#createProveedorDireccion').val()
-        };
-        console.log(data);
-        $.ajax({
-            type: 'POST',
-            url: '/Capturista/CreateProveedor',
-            contentType: 'application/json; charset=utf-8',
-            data: JSON.stringify(data),
-            success: function (response) {
-                if (response.success) {
-                    $('#createModalProveedor').modal('hide');
-                    showToastMessage('Proveedor agregado con éxito');
-                    refreshPage('Proveedor agregado con éxito');
-                } else {
-                    alert(response.message);
-                }
-            }
-        });
-    };
-
-    window.createCategoria = function () {
-        var data = {
-            Nombre: $('#createCategoriaNombre').val(),
-            Descripcion: $('#createCategoriaDescripcion').val(),
-            IdDepartamento: $('#createCategoriaDepartamento').val()
-        };
-        $.ajax({
-            type: 'POST',
-            url: '/Capturista/CreateCategoria',
-            contentType: 'application/json; charset=utf-8',
-            data: JSON.stringify(data),
-            success: function (response) {
-                if (response.success) {
-                    $('#createModalCategoria').modal('hide');
-                    showToastMessage('Categoría agregada con éxito');
-                    refreshPage('Categoría agregada con éxito');
-                } else {
-                    alert(response.message);
-                }
-            }
-        });
-    };
-
-    window.createSubcategoria = function () {
-        var data = {
-            Nombre: $('#createSubcategoriaNombre').val(),
-            Descripcion: $('#createSubcategoriaDescripcion').val(),
-            IdCategoria: $('#createSubcategoriaCategoria').val()
-        };
-        $.ajax({
-            type: 'POST',
-            url: '/Capturista/CreateSubcategoria',
-            contentType: 'application/json; charset=utf-8',
-            data: JSON.stringify(data),
-            success: function (response) {
-                if (response.success) {
-                    $('#createModalSubcategoria').modal('hide');
-                    showToastMessage('Subcategoría agregada con éxito');
-                    refreshPage('Subcategoría agregada con éxito');
-                } else {
-                    alert(response.message);
-                }
-            }
-        });
-    };
-
-    // Update Functions
-    window.updateDepartamento = function () {
-        var data = {
-            IdDepartamento: $('#editDepartamentoId').val(),
-            Nombre: $('#editDepartamentoNombre').val()
-        };
-        $.ajax({
-            type: 'PUT',
-            url: '/Capturista/UpdateDepartamento?id=' + data.IdDepartamento,
-            contentType: 'application/json; charset=utf-8',
-            data: JSON.stringify(data),
-            success: function (response) {
-                if (response.success) {
-                    $('#editModalDepartamento').modal('hide');
-                    showToastMessage('Departamento actualizado con éxito');
-                    refreshPage('Departamento actualizado con éxito');
-                } else {
-                    alert(response.message);
-                }
-            }
-        });
-    };
-
-    window.updateProveedor = function () {
-        var data = {
-            IdProveedor: $('#editProveedorId').val(),
-            Nombre: $('#editProveedorNombre').val(),
-            Telefono: $('#editProveedorTelefono').val(),
-            Direccion: $('#editProveedorDireccion').val()
-        };
-        $.ajax({
-            type: 'PUT',
-            url: '/Capturista/UpdateProveedor?id=' + data.IdProveedor,
-            contentType: 'application/json; charset=utf-8',
-            data: JSON.stringify(data),
-            success: function (response) {
-                if (response.success) {
-                    $('#editModalProveedor').modal('hide');
-                    showToastMessage('Proveedor actualizado con éxito');
-                    refreshPage('Proveedor actualizado con éxito');
-                } else {
-                    alert(response.message);
-                }
-            }
-        });
-    };
-
-    window.updateCategoria = function () {
-        var data = {
-            IdCategoria: $('#editCategoriaId').val(),
-            Nombre: $('#editCategoriaNombre').val(),
-            Descripcion: $('#editCategoriaDescripcion').val(),
-            IdDepartamento: $('#editCategoriaDepartamento').val()
-        };
-        $.ajax({
-            type: 'PUT',
-            url: '/Capturista/UpdateCategoria?id=' + data.IdCategoria,
-            contentType: 'application/json; charset=utf-8',
-            data: JSON.stringify(data),
-            success: function (response) {
-                if (response.success) {
-                    $('#editModalCategoria').modal('hide');
-                    showToastMessage('Categoría actualizada con éxito');
-                    refreshPage('Categoría actualizada con éxito');
-                } else {
-                    alert(response.message);
-                }
-            }
-        });
-    };
-
-    window.updateSubcategoria = function () {
-        var data = {
-            IdSubcategoria: $('#editSubcategoriaId').val(),
-            Nombre: $('#editSubcategoriaNombre').val(),
-            Descripcion: $('#editSubcategoriaDescripcion').val(),
-            IdCategoria: $('#editSubcategoriaCategoria').val()
-        };
-        $.ajax({
-            type: 'PUT',
-            url: '/Capturista/UpdateSubcategoria?id=' + data.IdSubcategoria,
-            contentType: 'application/json; charset=utf-8',
-            data: JSON.stringify(data),
-            success: function (response) {
-                if (response.success) {
-                    $('#editModalSubcategoria').modal('hide');
-                    showToastMessage('Subcategoría actualizada con éxito');
-                    refreshPage('Subcategoría actualizada con éxito');
-                } else {
-                    alert(response.message);
-                }
-            }
-        });
-    };
-
-    window.updateProducto = function () {
-        var formData = new FormData($('#editFormProducto')[0]);
-        $.ajax({
-            type: 'POST',  // Cambiar a POST para que sea compatible con FormData y ASP.NET
-            url: '/Capturista/UpdateProducto?id=' + formData.get('IdProductos'),
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (response) {
-                if (response.success) {
-                    $('#editModalProducto').modal('hide');
-                    showToastMessage('Producto actualizado con éxito');
-                    refreshPage('Producto actualizado con éxito');
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function (xhr) {
-                alert('Error al actualizar el producto: ' + xhr.responseText);
-            }
-        });
-    };
-
-
-    // Funciones para eliminar registros
-    function ajaxDelete(url, successMessage) {
-        $.ajax({
-            type: 'DELETE',
-            url: url,
-            success: function (response) {
-                if (response.success) {
-                    showToastMessage(successMessage);
-                    refreshPage(successMessage);
-                } else {
-                    alert(response.message);
-                }
-            }
-        });
-    }
-
-    window.deleteDepartamento = function (id) {
-        if (confirm('¿Estás seguro de que deseas eliminar este departamento?')) {
-            ajaxDelete('/Capturista/DeleteDepartamento?id=' + id, 'Departamento eliminado con éxito');
-        }
-    };
-
-    window.deleteProveedor = function (id) {
-        if (confirm('¿Estás seguro de que deseas eliminar este proveedor?')) {
-            ajaxDelete('/Capturista/DeleteProveedor?id=' + id, 'Proveedor eliminado con éxito');
-        }
-    };
-
-    window.deleteCategoria = function (id) {
-        if (confirm('¿Estás seguro de que deseas eliminar esta categoría?')) {
-            ajaxDelete('/Capturista/DeleteCategoria?id=' + id, 'Categoría eliminada con éxito');
-        }
-    };
-
-    window.deleteSubcategoria = function (id) {
-        if (confirm('¿Estás seguro de que deseas eliminar esta subcategoría?')) {
-            ajaxDelete('/Capturista/DeleteSubcategoria?id=' + id, 'Subcategoría eliminada con éxito');
-        }
-    };
-
-    window.deleteProducto = function (id) {
-        if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
-            ajaxDelete('/Capturista/DeleteProducto?id=' + id, 'Producto eliminado con éxito');
-        }
-    };
-
     // Check for any toast messages to show on page load
     checkForToastMessage();
 });
-

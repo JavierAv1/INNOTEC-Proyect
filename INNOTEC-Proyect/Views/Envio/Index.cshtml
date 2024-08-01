@@ -1,0 +1,190 @@
+﻿@model INNOTEC_Proyect.Models.EnvioPedidoViewModel
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulario de Envío y Pedido</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <style>
+        import url('https://fonts.googleapis.com/css?family=Noto+Sans');
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            background-color: #ab4493;
+            color: #0e0e0e;
+            height: 100%;
+        }
+        .contact_form {
+            width: 460px;
+            height: auto;
+            margin: 80px auto;
+            border-radius: 10px;
+            background-color: #fbfbfb;
+            padding: 30px;
+        }
+        input, textarea {
+            background-color: #fbfbfb;
+            border-radius: 5px;
+            border: 1px solid #ab4493;
+            padding: 10px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        label {
+            display: block;
+        }
+        button {
+            height: 45px;
+            text-transform: uppercase;
+            background-color: #ab4493;
+            border: none;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .aviso {
+            font-size: 13px;
+            color: #ab4493;
+        }
+        h1, h3 {
+            text-align: center;
+            color: #ab4493;
+        }
+        h1 {
+            font-size: 39px;
+            padding-bottom: 20px;
+        }
+        h3 {
+            font-size: 16px;
+            padding-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="contact_form">
+        <h1>Formulario de Envío y Pedido</h1>
+        <h3>Completa tus datos para el envío</h3>
+        <form id="envioPedidoForm">
+            @foreach (var item in Model.Envios)
+            {
+                <!-- Hidden field to keep track of Envio Ids -->
+                <input type="hidden" name="envioIds" value="@item.IdCompra" />
+            }
+            <!-- Código Postal -->
+            <div class="form-group">
+                <label>Código Postal:</label>
+                <input type="text" id="CodigoPostal" name="CodigoPostal" required placeholder="Escribe tu código postal">
+            </div>
+            <!-- Estado -->
+            <div class="form-group">
+                <label>Estado:</label>
+                <input type="text" id="Estado" name="Estado" required placeholder="Escribe tu estado">
+            </div>
+            <!-- Calle -->
+            <div class="form-group">
+                <label>Calle:</label>
+                <input type="text" id="Calle" name="Calle" required placeholder="Escribe tu calle">
+            </div>
+            <!-- Colonia -->
+            <div class="form-group">
+                <label>Colonia:</label>
+                <input type="text" id="Colonia" name="Colonia" required placeholder="Escribe tu colonia">
+            </div>
+            <!-- Municipio -->
+            <div class="form-group">
+                <label>Municipio:</label>
+                <input type="text" id="Municipio" name="Municipio" required placeholder="Escribe tu municipio">
+            </div>
+            <!-- Número -->
+            <div class="form-group">
+                <label>Número:</label>
+                <input type="text" id="Numero" name="Numero" required placeholder="Escribe el número de tu domicilio">
+            </div>
+            <!-- Button for Save Address -->
+            <div class="form-group">
+                <button id="saveAddressBtn" type="button" class="btn btn-info" onclick="saveAddress()">Guardar Dirección</button>
+            </div>
+            <!-- Button for Payment -->
+            <div class="form-group">
+                <button type="submit" class="btn btn-warning">Realizar Pago</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+
+    <script>
+        function saveAddress() {
+            var postData = {
+                CodigoPostal: $('#CodigoPostal').val(),
+                Estado: $('#Estado').val(),
+                Calle: $('#Calle').val(),
+                Colonia: $('#Colonia').val(),
+                Municipio: $('#Municipio').val(),
+                Numero: $('#Numero').val()
+            };
+
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("InsertEnvio", "Envio")',
+                contentType: 'application/json',
+                data: JSON.stringify(postData),
+                success: function (response) {
+                    if (response.success) {
+                        toastr.success('Dirección guardada con éxito!', 'Éxito', {
+                            positionClass: 'toast-bottom-right'
+                        });
+                        $('#saveAddressBtn').prop('disabled', true);
+                        showSummaryModal(postData);
+                    } else {
+                        toastr.error('Error al guardar la dirección.', 'Error', {
+                            positionClass: 'toast-bottom-right'
+                        });
+                    }
+                },
+                error: function () {
+                    toastr.error('Error al guardar la dirección.', 'Error', {
+                        positionClass: 'toast-bottom-right'
+                    });
+                }
+            });
+        }
+
+        function showSummaryModal(data) {
+            var modalHtml = `
+                    <div class="modal fade" id="summaryModal" tabindex="-1" role="dialog" aria-labelledby="summaryModalLabel">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title" id="summaryModalLabel">Resumen de Dirección</h4>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <p><strong>Código Postal:</strong> ${data.CodigoPostal}</p>
+                                    <p><strong>Estado:</strong> ${data.Estado}</p>
+                                    <p><strong>Calle:</strong> ${data.Calle}</p>
+                                    <p><strong>Colonia:</strong> ${data.Colonia}</p>
+                                    <p><strong>Municipio:</strong> ${data.Municipio}</p>
+                                    <p><strong>Número:</strong> ${data.Numero}</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+
+            $('body').append(modalHtml);
+            $('#summaryModal').modal('show');
+        }
+    </script>
+
+
+</body>
+</html>

@@ -603,94 +603,15 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="~/js/Capturista.js?v=@DateTime.Now.Ticks"></script>
 
-<script>
+@* <script>
+
+
+
     $(document).ready(function () {
         // Función para establecer la pestaña activa en el local storage
-        function setActiveTab(tabName) {
-            localStorage.setItem('activeTab', tabName);
-        }
 
-        // Función para obtener la pestaña activa desde el local storage
-        function getActiveTab() {
-            return localStorage.getItem('activeTab') || '#departamentos';
-        }
-
-        // Mostrar la pestaña activa
-        var activeTab = getActiveTab();
-        $('[data-bs-target="' + activeTab + '"]').tab('show');
-
-        // Establecer la pestaña activa al cambiar de pestaña
-        $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
-            var tabName = $(e.target).data('bs-target');
-            setActiveTab(tabName);
-        });
-
-        // Función para obtener datos y llenar el modal
-        function showEditModal(modalId, button) {
-            var id = button.data('id');
-            var urlMap = {
-                '#editModalDepartamento': '/Capturista/GetDepartamentoById?id=' + id,
-                '#editModalProveedor': '/Capturista/GetProveedorById?id=' + id,
-                '#editModalCategoria': '/Capturista/GetCategoriaById?id=' + id,
-                '#editModalSubcategoria': '/Capturista/GetSubcategoriaById?id=' + id,
-                '#editModalProducto': '/Capturista/GetProductoById?id=' + id
-            };
-            var fieldMap = {
-                '#editModalDepartamento': {
-                    '#editDepartamentoId': 'idDepartamento',
-                    '#editDepartamentoNombre': 'nombre'
-                },
-                '#editModalProveedor': {
-                    '#editProveedorId': 'idProveedor',
-                    '#editProveedorNombre': 'nombre',
-                    '#editProveedorTelefono': 'telefono',
-                    '#editProveedorDireccion': 'direccion'
-                },
-                '#editModalCategoria': {
-                    '#editCategoriaId': 'idCategoria',
-                    '#editCategoriaNombre': 'nombre',
-                    '#editCategoriaDescripcion': 'descripcion',
-                    '#editCategoriaDepartamento': 'idDepartamento'
-                },
-                '#editModalSubcategoria': {
-                    '#editSubcategoriaId': 'idSubcategoria',
-                    '#editSubcategoriaNombre': 'nombre',
-                    '#editSubcategoriaDescripcion': 'descripcion',
-                    '#editSubcategoriaCategoria': 'idCategoria'
-                },
-                '#editModalProducto': {
-                    '#editProductoId': 'idProductos',
-                    '#editProductoNombre': 'nombre',
-                    '#editProductoDescripcion': 'descripcionDelProducto',
-                    '#editProductoPrecio': 'precio',
-                    '#editProductoCantidad': 'cantidad',
-                    '#editProductoDepartamento': 'idDepartamento',
-                    '#editProductoCategoria': 'idCategoria',
-                    '#editProductoSubcategoria': 'idSubcategoria',
-                    '#editProductoProveedor': 'idProveedor'
-                }
-            };
-
-            $.getJSON(urlMap[modalId], function (response) {
-                if (response) {
-                    var fields = fieldMap[modalId];
-                    for (const [key, value] of Object.entries(fields)) {
-                        $(modalId).find(key).val(response[value]);
-                    }
-                } else {
-                    alert('Error al cargar los datos.');
-                }
-            }).fail(function () {
-                alert('Error al cargar los datos.');
-            });
-        }
-
-        // Mostrar modales de edición
-        $('#editModalDepartamento, #editModalProveedor, #editModalCategoria, #editModalSubcategoria, #editModalProducto').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget);
-            var modalId = '#' + $(this).attr('id');
-            showEditModal(modalId, button);
-        });
     });
-</script>
 
+
+</script>
+ *@
