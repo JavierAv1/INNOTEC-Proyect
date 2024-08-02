@@ -17,6 +17,8 @@ namespace ML
         public Compra Compra { get; set; }
         // Navegación a la entidad Envio
         public List<Envio> Envios { get; set; }
+
+        public int UsuarioId { get; set; }
     }
 
 

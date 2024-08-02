@@ -1,13 +1,17 @@
 ﻿using INNOTEC_Proyect.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
-using System.Threading.Tasks;
-using INNOTEC_Proyect.Clases;
-using ML;
 using System.Security.Claims;
+using System.Threading.Tasks;
+//using MercadoPago.Config;
+//using MercadoPago.Client.Preference;
+//using MercadoPago.Resource.Preference;
+using ML;
 
 namespace INNOTEC_Proyect.Controllers
 {
@@ -54,10 +58,6 @@ namespace INNOTEC_Proyect.Controllers
 
             return View(viewModel);
         }
-
-
-
-
 
         [HttpPost]
         public async Task<IActionResult> InsertEnvioPedido([FromBody] EnvioPedidoViewModel model)
@@ -106,21 +106,45 @@ namespace INNOTEC_Proyect.Controllers
         }
 
         [HttpGet]
-        public async Task<Envio> GetEnvioById(int id)
+        public async Task<IActionResult> GetEnviosByUserId()
         {
-            Envio envio = null;
-            string urlAPI = _configuration["UrlAPI"];
-            using (var client = new HttpClient())
+            List<Envio> envios = new List<Envio>();
+            try
             {
-                client.BaseAddress = new Uri(urlAPI);
-                var response = await client.GetAsync($"Envio/GetById?id={id}");
-                if (response.IsSuccessStatusCode)
+                var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+                if (userIdClaim == null)
                 {
-                    var resultString = await response.Content.ReadAsStringAsync();
-                    envio = JsonConvert.DeserializeObject<Envio>(resultString);
+                    return Unauthorized(new { success = false, message = "User not authenticated." });
                 }
-                return envio;
+
+                if (!int.TryParse(userIdClaim, out int userId))
+                {
+                    return BadRequest(new { success = false, message = "Invalid User ID." });
+                }
+
+                string urlAPI = _configuration["UrlAPI"];
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(urlAPI);
+                    var response = await client.GetAsync($"Envio/GetById?id={userId}");
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var resultString = await response.Content.ReadAsStringAsync();
+                        envios = JsonConvert.DeserializeObject<List<Envio>>(resultString);
+                    }
+                }
+
+                if (envios == null || !envios.Any())
+                {
+                    return NotFound(new { success = false, message = "No envios found for the user." });
+                }
             }
+            catch (Exception ex)
+            {
+                // Manejo de la excepción
+                return StatusCode(500, new { success = false, message = "Internal server error.", details = ex.Message });
+            }
+            return Ok(envios);
         }
 
         [HttpPost]
@@ -156,8 +180,6 @@ namespace INNOTEC_Proyect.Controllers
             }
         }
 
-
-
         [HttpPut]
         public async Task<IActionResult> UpdateEnvio(int id, Envio envio)
         {
@@ -191,87 +213,75 @@ namespace INNOTEC_Proyect.Controllers
         }
 
         //[HttpGet]
-        //public async Task<List<Pedido>> GetAllPedidos()
+        //public async Task<IActionResult> CreatePreference(int addressId)
         //{
-        //    List<Pedido> pedidos = new List<Pedido>();
-        //    string urlAPI = _configuration["UrlAPI"];
-        //    using (var client = new HttpClient())
+        //    var preferenceRequest = new PreferenceRequest
         //    {
-        //        client.BaseAddress = new Uri(urlAPI);
-        //        var response = await client.GetAsync("envio/GetAll");
-        //        if (response.IsSuccessStatusCode)
+        //        Items = new List<PreferenceItemRequest>
         //        {
-        //            var resultString = await response.Content.ReadAsStringAsync();
-        //            pedidos = JsonConvert.DeserializeObject<List<Pedido>>(resultString);
+        //            new PreferenceItemRequest
+        //            {
+        //                Title = "Compra en INNOTEC",
+        //                Quantity = 1,
+        //                CurrencyId = "MXN",
+        //                UnitPrice = 100.00m // Reemplaza con el precio real
+        //            }
+        //        },
+        //        Payer = new PreferencePayerRequest
+        //        {
+        //            Name = "Test",
+        //            Surname = "User",
+        //            Email = "test_user_123456@testuser.com"
         //        }
-        //        return pedidos;
+        //    };
+
+        //    MercadoPagoConfig.AccessToken = _configuration["MercadoPago:AccessToken"];
+        //    var client = new PreferenceClient();
+        //    var preference = await client.CreateAsync(preferenceRequest);
+
+        //    if (preference == null)
+        //    {
+        //        return BadRequest(new { success = false, message = "No se pudo crear la preferencia de pago." });
         //    }
+
+        //    return Ok(new { preferenceId = preference.Id });
         //}
 
-        //[HttpGet]
-        //public async Task<Pedido> GetPedidoById(int id)
-        //{
-        //    Pedido pedido = null;
-        //    string urlAPI = _configuration["UrlAPI"];
-        //    using (var client = new HttpClient())
-        //    {
-        //        client.BaseAddress = new Uri(urlAPI);
-        //        var response = await client.GetAsync($"envio/GetById?id={id}");
-        //        if (response.IsSuccessStatusCode)
-        //        {
-        //            var resultString = await response.Content.ReadAsStringAsync();
-        //            pedido = JsonConvert.DeserializeObject<Pedido>(resultString);
-        //        }
-        //        return pedido;
-        //    }
-        //}
+        [HttpPost]
+        public async Task<IActionResult> InsertPedido([FromBody] HomeViewModel model)
+        {
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
 
-        //[HttpPost]
-        //public async Task<IActionResult> InsertPedido(Pedido pedido)
-        //{
-        //    string urlAPI = _configuration["UrlAPI"];
-        //    using (var client = new HttpClient())
-        //    {
-        //        client.BaseAddress = new Uri(urlAPI);
-        //        var response = await client.PostAsJsonAsync("envio/Insert", pedido);
-        //        if (response.IsSuccessStatusCode)
-        //        {
-        //            return Ok();
-        //        }
-        //        return BadRequest();
-        //    }
-        //}
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { success = false, message = "User not authenticated." });
+            }
 
-        //[HttpPut]
-        //public async Task<IActionResult> UpdatePedido(int id, Pedido pedido)
-        //{
-        //    string urlAPI = _configuration["UrlAPI"];
-        //    using (var client = new HttpClient())
-        //    {
-        //        client.BaseAddress = new Uri(urlAPI);
-        //        var response = await client.PutAsJsonAsync($"envio/UpdatePedido?id={id}", pedido);
-        //        if (response.IsSuccessStatusCode)
-        //        {
-        //            return Ok();
-        //        }
-        //        return BadRequest();
-        //    }
-        //}
+            if (!int.TryParse(userIdClaim, out int userId))
+            {
+                return BadRequest(new { success = false, message = "Invalid User ID." });
+            }
 
-        //[HttpDelete]
-        //public async Task<IActionResult> DeletePedido(int id)
-        //{
-        //    string urlAPI = _configuration["UrlAPI"];
-        //    using (var client = new HttpClient())
-        //    {
-        //        client.BaseAddress = new Uri(urlAPI);
-        //        var response = await client.DeleteAsync($"envio/DeletePedido?id={id}");
-        //        if (response.IsSuccessStatusCode)
-        //        {
-        //            return Ok();
-        //        }
-        //        return BadRequest();
-        //    }
-        //}
+            var pedido = new Pedido
+            {
+                IdCompra = model.IdCompra,
+                FechaPedido = DateTime.Now,
+                UsuarioId = userId,
+                // Otros campos...
+            };
+
+            string urlAPI = _configuration["UrlAPI"];
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(urlAPI);
+                var response = await client.PostAsJsonAsync("Pedido/Insert", pedido);
+                if (!response.IsSuccessStatusCode)
+                {
+                    return BadRequest(new { success = false, message = "Error al insertar el pedido." });
+                }
+            }
+
+            return Ok(new { success = true });
+        }
     }
 }

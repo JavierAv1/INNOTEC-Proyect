@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <title>Formulario de Envío y Pedido</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
     <style>
         import url('https://fonts.googleapis.com/css?family=Noto+Sans');
         body {
@@ -14,6 +15,7 @@
             color: #0e0e0e;
             height: 100%;
         }
+
         .contact_form {
             width: 460px;
             height: auto;
@@ -21,7 +23,14 @@
             border-radius: 10px;
             background-color: #fbfbfb;
             padding: 30px;
+            transition: height 0.3s ease;
         }
+
+            .contact_form.reduced {
+                height: 100px;
+                overflow: hidden;
+            }
+
         input, textarea {
             background-color: #fbfbfb;
             border-radius: 5px;
@@ -30,9 +39,15 @@
             width: 100%;
             margin-top: 10px;
         }
+
+            input:disabled {
+                background-color: #e9ecef;
+            }
+
         label {
             display: block;
         }
+
         button {
             height: 45px;
             text-transform: uppercase;
@@ -44,73 +59,119 @@
             width: 100%;
             margin-top: 20px;
         }
+
         .aviso {
             font-size: 13px;
             color: #ab4493;
         }
+
         h1, h3 {
             text-align: center;
             color: #ab4493;
         }
+
         h1 {
             font-size: 39px;
             padding-bottom: 20px;
         }
+
         h3 {
             font-size: 16px;
             padding-bottom: 30px;
         }
+
+        .container {
+            width: 100%;
+            padding: 20px;
+        }
+
+        #savedAddresses {
+            background-color: #fbfbfb;
+            border-radius: 10px;
+            padding: 30px;
+            margin-top: 80px;
+        }
+
+        .list-group-item {
+            margin: 5px 0;
+            padding: 10px;
+            border: 1px solid #ab4493;
+            border-radius: 5px;
+        }
+
+            .list-group-item input {
+                margin-right: 10px;
+            }
+
+        #paymentBtn {
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <div class="contact_form">
-        <h1>Formulario de Envío y Pedido</h1>
-        <h3>Completa tus datos para el envío</h3>
-        <form id="envioPedidoForm">
-            @foreach (var item in Model.Envios)
-            {
-                <!-- Hidden field to keep track of Envio Ids -->
-                <input type="hidden" name="envioIds" value="@item.IdCompra" />
-            }
-            <!-- Código Postal -->
-            <div class="form-group">
-                <label>Código Postal:</label>
-                <input type="text" id="CodigoPostal" name="CodigoPostal" required placeholder="Escribe tu código postal">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div id="contactForm" class="contact_form">
+                    <h1>Formulario de Envío y Pedido</h1>
+                    <h3>Completa tus datos para el envío</h3>
+                    <form id="envioPedidoForm">
+                        @foreach (var item in Model.Envios)
+                        {
+                            <!-- Hidden field to keep track of Envio Ids -->
+                            <input type="hidden" name="envioIds" value="@item.IdCompra" />
+                        }
+                        <!-- Código Postal -->
+                        <div class="form-group">
+                            <label>Código Postal:</label>
+                            <input type="text" id="CodigoPostal" name="CodigoPostal" required placeholder="Escribe tu código postal" onfocus="deselectSavedAddresses()">
+                        </div>
+                        <!-- Estado -->
+                        <div class="form-group">
+                            <label>Estado:</label>
+                            <input type="text" id="Estado" name="Estado" required placeholder="Escribe tu estado" onfocus="deselectSavedAddresses()">
+                        </div>
+                        <!-- Calle -->
+                        <div class="form-group">
+                            <label>Calle:</label>
+                            <input type="text" id="Calle" name="Calle" required placeholder="Escribe tu calle" onfocus="deselectSavedAddresses()">
+                        </div>
+                        <!-- Colonia -->
+                        <div class="form-group">
+                            <label>Colonia:</label>
+                            <input type="text" id="Colonia" name="Colonia" required placeholder="Escribe tu colonia" onfocus="deselectSavedAddresses()">
+                        </div>
+                        <!-- Municipio -->
+                        <div class="form-group">
+                            <label>Municipio:</label>
+                            <input type="text" id="Municipio" name="Municipio" required placeholder="Escribe tu municipio" onfocus="deselectSavedAddresses()">
+                        </div>
+                        <!-- Número -->
+                        <div class="form-group">
+                            <label>Número:</label>
+                            <input type="text" id="Numero" name="Numero" required placeholder="Escribe el número de tu domicilio" onfocus="deselectSavedAddresses()">
+                        </div>
+                        <!-- Button for Save Address -->
+                        <div class="form-group">
+                            <button id="saveAddressBtn" type="button" class="btn btn-info" onclick="saveAddress()">Guardar Dirección</button>
+                        </div>
+                        <!-- Button for Enable Textboxes -->
+                        <div class="form-group">
+                            <button id="enableTextBoxesBtn" type="button" class="btn btn-secondary" onclick="enableTextBoxes()">Editar Dirección</button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <!-- Estado -->
-            <div class="form-group">
-                <label>Estado:</label>
-                <input type="text" id="Estado" name="Estado" required placeholder="Escribe tu estado">
+            <div class="col-md-6">
+                <div id="savedAddresses">
+                    <h3>Direcciones Guardadas</h3>
+                    <ul id="addressList" class="list-group">
+                        <!-- Saved addresses will be loaded here -->
+                    </ul>
+                    <button id="paymentBtn" type="button" class="btn btn-warning" onclick="redirectToPayment()">Realizar Pago</button>
+                </div>
             </div>
-            <!-- Calle -->
-            <div class="form-group">
-                <label>Calle:</label>
-                <input type="text" id="Calle" name="Calle" required placeholder="Escribe tu calle">
-            </div>
-            <!-- Colonia -->
-            <div class="form-group">
-                <label>Colonia:</label>
-                <input type="text" id="Colonia" name="Colonia" required placeholder="Escribe tu colonia">
-            </div>
-            <!-- Municipio -->
-            <div class="form-group">
-                <label>Municipio:</label>
-                <input type="text" id="Municipio" name="Municipio" required placeholder="Escribe tu municipio">
-            </div>
-            <!-- Número -->
-            <div class="form-group">
-                <label>Número:</label>
-                <input type="text" id="Numero" name="Numero" required placeholder="Escribe el número de tu domicilio">
-            </div>
-            <!-- Button for Save Address -->
-            <div class="form-group">
-                <button id="saveAddressBtn" type="button" class="btn btn-info" onclick="saveAddress()">Guardar Dirección</button>
-            </div>
-            <!-- Button for Payment -->
-            <div class="form-group">
-                <button type="submit" class="btn btn-warning">Realizar Pago</button>
-            </div>
-        </form>
+        </div>
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -118,6 +179,46 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
 
     <script>
+        const mp = new MercadoPago('YOUR_PUBLIC_KEY_HERE', {
+            locale: 'es-AR'
+        });
+
+        $(document).ready(function () {
+            loadSavedAddresses();
+            $('#addressList').on('change', 'input[name="selectedAddress"]', function () {
+                disableTextBoxes();
+                $('#paymentBtn').show();
+            });
+        });
+
+        function loadSavedAddresses() {
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("GetEnviosByUserId", "Envio")',
+                success: function (response) {
+                    if (response && response.length > 0) {
+                        var addressList = $('#addressList');
+                        addressList.empty();
+                        $.each(response, function (index, address) {
+                            addressList.append(
+                                `<li class="list-group-item">
+                                            <input type="radio" name="selectedAddress" value="${address.idEnvio}" />
+                                            ${address.codigoPostal}, ${address.estado}, ${address.calle}, ${address.colonia}, ${address.municipio}, ${address.numero}
+                                        </li>`
+                            );
+                        });
+                    } else {
+                        $('#savedAddresses').html('<p>No tienes direcciones guardadas.</p>');
+                    }
+                },
+                error: function () {
+                    toastr.error('Error al cargar las direcciones guardadas.', 'Error', {
+                        positionClass: 'toast-bottom-right'
+                    });
+                }
+            });
+        }
+
         function saveAddress() {
             var postData = {
                 CodigoPostal: $('#CodigoPostal').val(),
@@ -139,7 +240,8 @@
                             positionClass: 'toast-bottom-right'
                         });
                         $('#saveAddressBtn').prop('disabled', true);
-                        showSummaryModal(postData);
+                        $('#contactForm').addClass('reduced');
+                        loadSavedAddresses(); // Reload saved addresses after saving a new one
                     } else {
                         toastr.error('Error al guardar la dirección.', 'Error', {
                             positionClass: 'toast-bottom-right'
@@ -154,37 +256,99 @@
             });
         }
 
-        function showSummaryModal(data) {
-            var modalHtml = `
-                    <div class="modal fade" id="summaryModal" tabindex="-1" role="dialog" aria-labelledby="summaryModalLabel">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h4 class="modal-title" id="summaryModalLabel">Resumen de Dirección</h4>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <p><strong>Código Postal:</strong> ${data.CodigoPostal}</p>
-                                    <p><strong>Estado:</strong> ${data.Estado}</p>
-                                    <p><strong>Calle:</strong> ${data.Calle}</p>
-                                    <p><strong>Colonia:</strong> ${data.Colonia}</p>
-                                    <p><strong>Municipio:</strong> ${data.Municipio}</p>
-                                    <p><strong>Número:</strong> ${data.Numero}</p>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>`;
+        function redirectToPayment() {
+            var selectedAddressId = $('input[name="selectedAddress"]:checked').val();
+            if (selectedAddressId) {
+                $.ajax({
+                    type: 'GET',
+                    url: '@Url.Action("CreatePreference", "Envio")',
+                    data: { addressId: selectedAddressId },
+                    success: function (response) {
+                        if (response && response.preferenceId) {
+                            mp.checkout({
+                                preference: {
+                                    id: response.preferenceId
+                                },
+                                autoOpen: true,
+                                onReturn: function (data) {
+                                    if (data.status === 'approved') {
+                                        insertPedido(selectedAddressId);
+                                    } else {
+                                        toastr.error('No se pudo realizar el pago.', 'Error', {
+                                            positionClass: 'toast-bottom-right'
+                                        });
+                                    }
+                                }
+                            });
+                        } else {
+                            toastr.error('No se pudo crear la preferencia de pago.', 'Error', {
+                                positionClass: 'toast-bottom-right'
+                            });
+                        }
+                    },
+                    error: function () {
+                        toastr.error('Error al iniciar el pago.', 'Error', {
+                            positionClass: 'toast-bottom-right'
+                        });
+                    }
+                });
+            } else {
+                toastr.error('Por favor selecciona una dirección antes de proceder al pago.', 'Error', {
+                    positionClass: 'toast-bottom-right'
+                });
+            }
+        }
 
-            $('body').append(modalHtml);
-            $('#summaryModal').modal('show');
+        function insertPedido(addressId) {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("InsertPedido", "Envio")',
+                contentType: 'application/json',
+                data: JSON.stringify({ addressId: addressId }),
+                success: function (response) {
+                    if (response.success) {
+                        toastr.success('Pedido creado con éxito!', 'Éxito', {
+                            positionClass: 'toast-bottom-right'
+                        });
+                    } else {
+                        toastr.error('Error al crear el pedido.', 'Error', {
+                            positionClass: 'toast-bottom-right'
+                        });
+                    }
+                },
+                error: function () {
+                    toastr.error('Error al crear el pedido.', 'Error', {
+                        positionClass: 'toast-bottom-right'
+                    });
+                }
+            });
+        }
+
+        function disableTextBoxes() {
+            $('#CodigoPostal').prop('disabled', true);
+            $('#Estado').prop('disabled', true);
+            $('#Calle').prop('disabled', true);
+            $('#Colonia').prop('disabled', true);
+            $('#Municipio').prop('disabled', true);
+            $('#Numero').prop('disabled', true);
+        }
+
+        function enableTextBoxes() {
+            $('#CodigoPostal').prop('disabled', false);
+            $('#Estado').prop('disabled', false);
+            $('#Calle').prop('disabled', false);
+            $('#Colonia').prop('disabled', false);
+            $('#Municipio').prop('disabled', false);
+            $('#Numero').prop('disabled', false);
+            $('input[name="selectedAddress"]').prop('checked', false);
+            $('#paymentBtn').hide();
+        }
+
+        function deselectSavedAddresses() {
+            $('input[name="selectedAddress"]').prop('checked', false);
+            $('#paymentBtn').hide();
+            enableTextBoxes();
         }
     </script>
-
-
 </body>
 </html>
