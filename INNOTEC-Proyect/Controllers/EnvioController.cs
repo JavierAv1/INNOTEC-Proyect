@@ -8,9 +8,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
-//using MercadoPago.Config;
-//using MercadoPago.Client.Preference;
-//using MercadoPago.Resource.Preference;
+using MercadoPago.Config;
+using MercadoPago.Client.Preference;
+using MercadoPago.Resource.Preference;
 using ML;
 
 namespace INNOTEC_Proyect.Controllers
@@ -212,40 +212,40 @@ namespace INNOTEC_Proyect.Controllers
             }
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> CreatePreference(int addressId)
-        //{
-        //    var preferenceRequest = new PreferenceRequest
-        //    {
-        //        Items = new List<PreferenceItemRequest>
-        //        {
-        //            new PreferenceItemRequest
-        //            {
-        //                Title = "Compra en INNOTEC",
-        //                Quantity = 1,
-        //                CurrencyId = "MXN",
-        //                UnitPrice = 100.00m // Reemplaza con el precio real
-        //            }
-        //        },
-        //        Payer = new PreferencePayerRequest
-        //        {
-        //            Name = "Test",
-        //            Surname = "User",
-        //            Email = "test_user_123456@testuser.com"
-        //        }
-        //    };
+        [HttpGet]
+        public async Task<IActionResult> CreatePreference(int addressId)
+        {
+            var preferenceRequest = new PreferenceRequest
+            {
+                Items = new List<PreferenceItemRequest>
+                {
+                    new PreferenceItemRequest
+                    {
+                        Title = "Compra en INNOTEC",
+                        Quantity = 1,
+                        CurrencyId = "MXN",
+                        UnitPrice = 1.00m // Reemplazar con el precio real
+                    }
+                },
+                Payer = new PreferencePayerRequest
+                {
+                    Name = "Test",
+                    Surname = "User",
+                    Email = "test_user_123456@testuser.com"
+                }
+            };
 
-        //    MercadoPagoConfig.AccessToken = _configuration["MercadoPago:AccessToken"];
-        //    var client = new PreferenceClient();
-        //    var preference = await client.CreateAsync(preferenceRequest);
+            MercadoPagoConfig.AccessToken = _configuration["MercadoPago:AccessToken"];
+            var client = new PreferenceClient();
+            var preference = await client.CreateAsync(preferenceRequest);
 
-        //    if (preference == null)
-        //    {
-        //        return BadRequest(new { success = false, message = "No se pudo crear la preferencia de pago." });
-        //    }
+            if (preference == null)
+            {
+                return BadRequest(new { success = false, message = "No se pudo crear la preferencia de pago." });
+            }
 
-        //    return Ok(new { preferenceId = preference.Id });
-        //}
+            return Ok(new { preferenceId = preference.Id });
+        }
 
         [HttpPost]
         public async Task<IActionResult> InsertPedido([FromBody] HomeViewModel model)
@@ -266,8 +266,7 @@ namespace INNOTEC_Proyect.Controllers
             {
                 IdCompra = model.IdCompra,
                 FechaPedido = DateTime.Now,
-                UsuarioId = userId,
-                // Otros campos...
+                UsuarioId = userId
             };
 
             string urlAPI = _configuration["UrlAPI"];
