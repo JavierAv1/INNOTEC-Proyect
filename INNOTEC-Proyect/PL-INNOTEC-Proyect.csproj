@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\css\indexEnvio.css" />
     <_ContentIncludedByDefault Remove="wwwroot\css\stylecarrito.css" />
     <_ContentIncludedByDefault Remove="wwwroot\js\Admin.js" />
     <_ContentIncludedByDefault Remove="wwwroot\js\carrito.js" />

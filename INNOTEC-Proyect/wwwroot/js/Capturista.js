@@ -91,6 +91,44 @@
     }
 
     // Definimos las funciones en el ámbito global
+
+    window.createProducto = function () {
+        var formData = new FormData();
+        formData.append('Nombre', $('#createProductoNombre').val());
+        formData.append('DescripcionDelProducto', $('#createProductoDescripcion').val());
+        formData.append('Precio', $('#createProductoPrecio').val());
+        formData.append('Cantidad', $('#createProductoCantidad').val());
+        formData.append('IdDepartamento', $('#createProductoDepartamento').val());
+        formData.append('IdCategoria', $('#createProductoCategoria').val());
+        formData.append('IdSubcategoria', $('#createProductoSubcategoria').val());
+        formData.append('IdProveedor', $('#createProductoProveedor').val());
+
+        // Si hay un archivo seleccionado
+        var fileInput = $('#createProductoImagen')[0];
+        if (fileInput.files.length > 0) {
+            formData.append('ImagenDelProducto', fileInput.files[0]);
+        }
+
+        $.ajax({
+            url: '/Capturista/CreateProducto',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.success) {
+                    closeModal('#editModalProducto');
+                    showToastMessage('Producto agregado con éxito');
+                    refreshPage('Producto agregado con éxito');
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function (xhr) {
+                alert('Error al agregar el producto: ' + xhr.responseText);
+            }
+        });
+    };
     window.createDepartamento = function () {
         var data = {
             Nombre: $('#createDepartamentoNombre').val()
@@ -124,49 +162,6 @@
         };
         ajaxFormSubmit('/Capturista/CreateSubcategoria', data, '#createModalSubcategoria', 'Subcategoría agregada con éxito');
     }
-
-    window.updateProducto = function () {
-        var formData = new FormData($('#editFormProducto')[0]);
-
-        formData.append('IdProductos', $('#editProductoId').val());
-        formData.append('Nombre', $('#editProductoNombre').val());
-        formData.append('DescripcionDelProducto', $('#editProductoDescripcion').val());
-        formData.append('Precio', $('#editProductoPrecio').val());
-        formData.append('Cantidad', $('#editProductoCantidad').val());
-        formData.append('IdDepartamento', $('#editProductoDepartamento').val());
-        formData.append('IdCategoria', $('#editProductoCategoria').val());
-        formData.append('IdSubcategoria', $('#editProductoSubcategoria').val());
-        formData.append('IdProveedor', $('#editProductoProveedor').val());
-
-        // Si hay un archivo seleccionado
-        var fileInput = $('#editProductoImagen')[0];
-        if (fileInput.files.length > 0) {
-            formData.append('ImagenDelProducto', fileInput.files[0]);
-        }
-
-        $.ajax({
-            type: 'POST',
-            url: '/Capturista/UpdateProducto?id=' + formData.get('IdProductos'),
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (response) {
-                console.log("Response from server:", response);
-                if (response.success) {
-                    closeModal('#editModalProducto');
-                    showToastMessage('Producto actualizado con éxito');
-                    refreshPage('Producto actualizado con éxito');
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function (xhr) {
-                console.error('Error al actualizar el producto:', xhr);
-                alert('Error al actualizar el producto: ' + xhr.responseText);
-            }
-        });
-    }
-
 
     window.updateDepartamento = function () {
         var data = {

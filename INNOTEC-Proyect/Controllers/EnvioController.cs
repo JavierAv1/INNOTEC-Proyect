@@ -12,6 +12,10 @@ using MercadoPago.Config;
 using MercadoPago.Client.Preference;
 using MercadoPago.Resource.Preference;
 using ML;
+using MercadoPago.Client.Common;
+using MercadoPago.Client.Payment;
+
+
 
 namespace INNOTEC_Proyect.Controllers
 {
@@ -55,7 +59,8 @@ namespace INNOTEC_Proyect.Controllers
                 Pedidos = listaIdsCompra.Select(id => new Pedido { IdCompra = id }).ToList(),
                 Total = total ?? 0
             };
-
+            // Obtener la clave pública de la configuración y pasarla a la vista
+            ViewBag.PublicKey = _configuration["MercadoPago:PublicKey"];
             return View(viewModel);
         }
 
@@ -84,8 +89,6 @@ namespace INNOTEC_Proyect.Controllers
                 return Ok("Envío y Pedido creados con éxito.");
             }
         }
-
-        // Otros métodos de Envio y Pedido...
 
         [HttpGet]
         public async Task<List<Envio>> GetAllEnvios()
@@ -212,41 +215,6 @@ namespace INNOTEC_Proyect.Controllers
             }
         }
 
-        [HttpGet]
-        public async Task<IActionResult> CreatePreference(int addressId)
-        {
-            var preferenceRequest = new PreferenceRequest
-            {
-                Items = new List<PreferenceItemRequest>
-                {
-                    new PreferenceItemRequest
-                    {
-                        Title = "Compra en INNOTEC",
-                        Quantity = 1,
-                        CurrencyId = "MXN",
-                        UnitPrice = 1.00m // Reemplazar con el precio real
-                    }
-                },
-                Payer = new PreferencePayerRequest
-                {
-                    Name = "Test",
-                    Surname = "User",
-                    Email = "test_user_123456@testuser.com"
-                }
-            };
-
-            MercadoPagoConfig.AccessToken = _configuration["MercadoPago:AccessToken"];
-            var client = new PreferenceClient();
-            var preference = await client.CreateAsync(preferenceRequest);
-
-            if (preference == null)
-            {
-                return BadRequest(new { success = false, message = "No se pudo crear la preferencia de pago." });
-            }
-
-            return Ok(new { preferenceId = preference.Id });
-        }
-
         [HttpPost]
         public async Task<IActionResult> InsertPedido([FromBody] HomeViewModel model)
         {
@@ -282,5 +250,48 @@ namespace INNOTEC_Proyect.Controllers
 
             return Ok(new { success = true });
         }
+
+        [HttpPost]
+        [Route("Envio/create_Preference")]
+        public async Task<IActionResult> CreatePreference([FromBody] OrderData orderData)
+        {
+            var accessToken = _configuration["MercadoPago:AccessToken"];
+            MercadoPagoConfig.AccessToken = accessToken;
+            // Crea el objeto de request de la preference
+            var request = new PreferenceRequest
+            {
+                Items = new List<PreferenceItemRequest>
+                {
+                    new PreferenceItemRequest
+                    {
+                        Title = orderData.Title,
+                        Quantity = orderData.Quantity,
+                        CurrencyId = "MXN",
+                        UnitPrice = orderData.Price,
+                    },
+                },
+                BackUrls = new PreferenceBackUrlsRequest
+                {
+                    Success = "https://github.com/JavierAv1/WS-INNOTEC",
+                    Failure = "https://github.com/JavierAv1/WS-INNOTEC",
+                    Pending = "https://github.com/JavierAv1/WS-INNOTEC",
+                },
+                AutoReturn  = "approved"
+            };
+
+            // Crea la preferencia usando el client
+            var client = new PreferenceClient();
+            Preference preference = await client.CreateAsync(request);
+
+            // Devuelve el preferenceId al cliente
+            return Ok(new { id = preference.Id });
+        }
+    }
+
+    public class OrderData
+    {
+        public string Title { get; set; }
+        public int Quantity { get; set; }
+        public decimal Price { get; set; }
     }
 }

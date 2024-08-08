@@ -2,6 +2,14 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configurar appsettings.json
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
+// Leer claves de configuración
+var mercadoPagoConfig = builder.Configuration.GetSection("MercadoPago");
+var publicKey = mercadoPagoConfig["PublicKey"];
+var accessToken = mercadoPagoConfig["AccessToken"];
+
 // Agregar servicios y configurar HttpClient
 builder.Services.AddControllersWithViews();
 
@@ -38,11 +46,8 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllerRoute(
-        name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}");
-});
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

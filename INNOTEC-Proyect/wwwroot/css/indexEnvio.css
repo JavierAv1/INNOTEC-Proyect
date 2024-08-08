@@ -1,0 +1,94 @@
+﻿@import url('https://fonts.googleapis.com/css?family=Noto+Sans');
+
+body {
+    font-family: 'Noto Sans', sans-serif;
+    background-color: #ab4493;
+    color: #0e0e0e;
+    height: 100%;
+}
+
+.contact_form {
+    width: 460px;
+    height: auto;
+    margin: 80px auto;
+    border-radius: 10px;
+    background-color: #fbfbfb;
+    padding: 30px;
+    transition: height 0.3s ease;
+}
+
+input, textarea {
+    background-color: #fbfbfb;
+    border-radius: 5px;
+    border: 1px solid #ab4493;
+    padding: 10px;
+    width: 100%;
+    margin-top: 10px;
+}
+
+    input:disabled {
+        background-color: #e9ecef;
+    }
+
+label {
+    display: block;
+}
+
+button {
+    height: 45px;
+    text-transform: uppercase;
+    background-color: #ab4493;
+    border: none;
+    color: white;
+    border-radius: 10px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.aviso {
+    font-size: 13px;
+    color: #ab4493;
+}
+
+h1, h3 {
+    text-align: center;
+    color: #ab4493;
+}
+
+h1 {
+    font-size: 39px;
+    padding-bottom: 20px;
+}
+
+h3 {
+    font-size: 16px;
+    padding-bottom: 30px;
+}
+
+.container {
+    width: 100%;
+    padding: 20px;
+}
+
+#savedAddresses {
+    background-color: #fbfbfb;
+    border-radius: 10px;
+    padding: 30px;
+    margin-top: 80px;
+}
+
+.list-group-item {
+    margin: 5px 0;
+    padding: 10px;
+    border: 1px solid #ab4493;
+    border-radius: 5px;
+}
+
+    .list-group-item input {
+        margin-right: 10px;
+    }
+
+#paymentBtn {
+    display: none;
+}
