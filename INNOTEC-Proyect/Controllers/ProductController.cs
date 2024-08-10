@@ -1,15 +1,15 @@
-﻿using INNOTEC_Proyect.Models;
+﻿using INNOTEC_Proyect.Clases;
+using INNOTEC_Proyect.Models;
 using Microsoft.AspNetCore.Mvc;
 using ML;
 using Newtonsoft.Json;
-using INNOTEC_Proyect.Clases;
 
 namespace INNOTEC_Proyect.Controllers
 {
     public class ProductController : Controller
     {
         private readonly IConfiguration _configuration;
-        private readonly IWebHostEnvironment _environment;  
+        private readonly IWebHostEnvironment _environment;
 
         public ProductController(IConfiguration configuration, IWebHostEnvironment hostingEnvironment)
         {
@@ -76,7 +76,7 @@ namespace INNOTEC_Proyect.Controllers
 
             };
 
-            return View("~/Views/Products/Products.cshtml", viewModel);  
+            return View("~/Views/Products/Products.cshtml", viewModel);
         }
     }
 }

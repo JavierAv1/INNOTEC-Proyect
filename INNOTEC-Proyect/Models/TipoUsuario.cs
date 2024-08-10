@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace ML;
+﻿namespace ML;
 
 public partial class TipoUsuario
 {

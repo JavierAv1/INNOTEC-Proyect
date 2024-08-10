@@ -1,12 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using ML;
+﻿using INNOTEC_Proyect.Clases;
 using INNOTEC_Proyect.Models;
-using Microsoft.Extensions.Configuration;
-using INNOTEC_Proyect.Clases;
+using Microsoft.AspNetCore.Mvc;
+using ML;
 using Newtonsoft.Json;
 using System.Text;
 

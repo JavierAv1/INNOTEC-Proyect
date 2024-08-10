@@ -1,27 +1,73 @@
 ﻿document.addEventListener("DOMContentLoaded", () => {
     const mp = new MercadoPago(publicKey, {
         locale: "es-MX",
-        sandbox: true 
+        sandbox: true
     });
 
     document.getElementById("paymentBtn").addEventListener("click", async () => {
         try {
-            const orderData = {
-                title: "Products",
-                quantity: 1,
-                price: 100,
+            const selectedAddressId = $('input[name="selectedAddress"]:checked').val();
+            if (!selectedAddressId) {
+                alert("Por favor selecciona una dirección antes de proceder al pago.");
+                return;
+            }
+
+            // Construye la lista de pedidos con el IdEnvio incluido
+            const pedidos = [];
+            $('.idcompra').each(function () {
+                pedidos.push({
+                    IdCompra: parseInt($(this).val()),
+                    FechaPedido: new Date().toISOString(),
+                    EstadoPedido: "Entrante",
+                    UsuarioId: 1, // Cambia esto si lo necesitas
+                    Envios: [{
+                        IdEnvio: parseInt(selectedAddressId)
+                    }]
+                });
+            });
+
+            const pedidoData = {
+                Pedidos: pedidos
             };
-            const response = await fetch("/Envio/create_Preference", {
+
+            const insertPedidoResponse = await fetch("/Envio/InsertPedido", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(orderData),
+                body: JSON.stringify(pedidoData),
             });
-            const preference = await response.json();
-            createCheckoutButton(preference.id);
+
+            const insertPedidoResult = await insertPedidoResponse.json();
+
+            if (insertPedidoResult.success) {
+  
+                const orderData = {
+                    title: "Products",
+                    quantity: 0,
+                    price: 100, 
+                };
+
+                const response = await fetch("/Envio/create_Preference", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(orderData),
+                });
+
+                const preference = await response.json();
+
+                if (preference.success && preference.id) {
+                    createCheckoutButton(preference.id);
+                } else {
+                    alert("Error al crear la preferencia de pago. Por favor, inténtalo de nuevo.");
+                }
+            } else {
+                alert("Error al insertar el pedido. Por favor, inténtalo de nuevo.");
+            }
         } catch (error) {
-            alert("error :(");
+            alert("Error :(");
         }
     });
 
@@ -46,6 +92,8 @@
 
     $(document).ready(function () {
         loadSavedAddresses();
+
+   
         $('#addressList').on('change', 'input[name="selectedAddress"]', function () {
             disableTextBoxes();
             $('#paymentBtn').show();
@@ -78,55 +126,6 @@
                 });
             }
         });
-    }
-
-    function saveAddress() {
-        var postData = {
-            CodigoPostal: $('#CodigoPostal').val(),
-            Estado: $('#Estado').val(),
-            Calle: $('#Calle').val(),
-            Colonia: $('#Colonia').val(),
-            Municipio: $('#Municipio').val(),
-            Numero: $('#Numero').val()
-        };
-
-        $.ajax({
-            type: 'POST',
-            url: '/Envio/InsertEnvio',
-            contentType: 'application/json',
-            data: JSON.stringify(postData),
-            success: function (response) {
-                if (response.success) {
-                    toastr.success('Dirección guardada con éxito!', 'Éxito', {
-                        positionClass: 'toast-bottom-right'
-                    });
-                    $('#saveAddressBtn').prop('disabled', true);
-                    $('#contactForm').addClass('reduced');
-                    loadSavedAddresses(); // Reload saved addresses after saving a new one
-                } else {
-                    toastr.error('Error al guardar la dirección.', 'Error', {
-                        positionClass: 'toast-bottom-right'
-                    });
-                }
-            },
-            error: function () {
-                toastr.error('Error al guardar la dirección.', 'Error', {
-                    positionClass: 'toast-bottom-right'
-                });
-            }
-        });
-    }
-
-    function redirectToPayment() {
-        var selectedAddressId = $('input[name="selectedAddress"]:checked').val();
-        if (selectedAddressId) {
-            // Redirigir a la página de pago (reemplazar la URL con la página de pago correspondiente)
-            window.location.href = '/PaymentPage?addressId=' + selectedAddressId;
-        } else {
-            toastr.error('Por favor selecciona una dirección antes de proceder al pago.', 'Error', {
-                positionClass: 'toast-bottom-right'
-            });
-        }
     }
 
     function disableTextBoxes() {

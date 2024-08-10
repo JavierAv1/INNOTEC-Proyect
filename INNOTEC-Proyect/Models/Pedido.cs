@@ -1,25 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ML
+﻿namespace ML
 {
     public class Pedido
     {
-        public int IdPedido { get; set; }
-        public int IdCompra { get; set; }
-        public DateTime FechaPedido { get; set; }
-        public string EstadoPedido { get; set; }
+        public int? IdPedido { get; set; }
+        public int? IdCompra { get; set; }
+        public DateTime? FechaPedido { get; set; }
+        public string? EstadoPedido { get; set; }
 
-        // Navegación a la entidad Compra
-        public Compra Compra { get; set; }
-        // Navegación a la entidad Envio
-        public List<Envio> Envios { get; set; }
+        public Compra? Compra { get; set; } // Relación con Compra
+        public ICollection<Envio>? Envios { get; set; } // Relación con Envio
 
-        public int UsuarioId { get; set; }
+        public int? UsuarioId { get; set; }
     }
-
-
 }

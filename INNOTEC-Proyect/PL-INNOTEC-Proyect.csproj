@@ -10,6 +10,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Style\**" />
+    <Content Remove="Style\**" />
+    <EmbeddedResource Remove="Style\**" />
+    <None Remove="Style\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="wwwroot\css\stylecatalogo.css" />
     <Content Remove="wwwroot\js\Admin.js" />
     <Content Remove="wwwroot\js\carrito.js" />
@@ -43,10 +50,6 @@
     <None Include="wwwroot\Images\usuario.png" />
     <None Include="wwwroot\js\Admin.js" />
     <None Include="wwwroot\js\carrito.js" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Style\" />
   </ItemGroup>
 
 </Project>

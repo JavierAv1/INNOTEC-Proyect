@@ -1,19 +1,10 @@
 ﻿using INNOTEC_Proyect.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using MercadoPago.Config;
 using MercadoPago.Client.Preference;
+using MercadoPago.Config;
 using MercadoPago.Resource.Preference;
+using Microsoft.AspNetCore.Mvc;
 using ML;
-using MercadoPago.Client.Common;
-using MercadoPago.Client.Payment;
+using Newtonsoft.Json;
 
 
 
@@ -24,7 +15,8 @@ namespace INNOTEC_Proyect.Controllers
         private readonly IConfiguration _configuration;
         private readonly IWebHostEnvironment _environment;
         private readonly IHttpClientFactory _httpClientFactory;
-
+        public int Cantidad { get; set; }
+        public decimal Total { get; set; }
         public EnvioController(IConfiguration configuration, IWebHostEnvironment hostingEnvironment, IHttpClientFactory httpClientFactory)
         {
             _configuration = configuration;
@@ -32,7 +24,7 @@ namespace INNOTEC_Proyect.Controllers
             _httpClientFactory = httpClientFactory;
         }
 
-        public IActionResult Index(string idCompra, string idsCompra, decimal? total)
+        public IActionResult Index(string idCompra, string idsCompra, decimal? total, int? cantidad)
         {
             List<int> listaIdsCompra = new List<int>();
 
@@ -53,16 +45,32 @@ namespace INNOTEC_Proyect.Controllers
                 }).Where(id => id != 0).ToList());
             }
 
+            Cantidad = cantidad ?? 0;
+            Total = total ?? 0;
+
+            var pedidos = listaIdsCompra.Select(id => new Pedido
+            {
+                IdCompra = id
+            }).ToList();
+
             var viewModel = new EnvioPedidoViewModel
             {
                 Envios = listaIdsCompra.Select(id => new Envio { IdCompra = id }).ToList(),
-                Pedidos = listaIdsCompra.Select(id => new Pedido { IdCompra = id }).ToList(),
+                Pedidos = pedidos,
                 Total = total ?? 0
             };
-            // Obtener la clave pública de la configuración y pasarla a la vista
+
+            // Guardar valores en la sesión
+            HttpContext.Session.SetInt32("Cantidad", Cantidad);
+            HttpContext.Session.SetString("Total", Total.ToString());
+            HttpContext.Session.SetString("Pedidos", JsonConvert.SerializeObject(pedidos));
+
             ViewBag.PublicKey = _configuration["MercadoPago:PublicKey"];
             return View(viewModel);
         }
+
+
+
 
         [HttpPost]
         public async Task<IActionResult> InsertEnvioPedido([FromBody] EnvioPedidoViewModel model)
@@ -216,7 +224,7 @@ namespace INNOTEC_Proyect.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> InsertPedido([FromBody] HomeViewModel model)
+        public async Task<IActionResult> InsertPedido([FromBody] Pedido pedido)
         {
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
 
@@ -230,22 +238,37 @@ namespace INNOTEC_Proyect.Controllers
                 return BadRequest(new { success = false, message = "Invalid User ID." });
             }
 
-            var pedido = new Pedido
-            {
-                IdCompra = model.IdCompra,
-                FechaPedido = DateTime.Now,
-                UsuarioId = userId
-            };
+            // Recuperar valores desde la sesión
+            Cantidad = HttpContext.Session.GetInt32("Cantidad") ?? 0;
+            Total = decimal.Parse(HttpContext.Session.GetString("Total"));
+            var pedidos = JsonConvert.DeserializeObject<List<Pedido>>(HttpContext.Session.GetString("Pedidos"));
 
+            // Ahora puedes usar los valores de Cantidad, Total, y la lista de Pedidos
             string urlAPI = _configuration["UrlAPI"];
-            using (var client = new HttpClient())
+
+            if (pedidos != null && pedidos.Any())
             {
-                client.BaseAddress = new Uri(urlAPI);
-                var response = await client.PostAsJsonAsync("Pedido/Insert", pedido);
-                if (!response.IsSuccessStatusCode)
+                foreach (var individualPedido in pedidos)
                 {
-                    return BadRequest(new { success = false, message = "Error al insertar el pedido." });
+                    individualPedido.UsuarioId = userId;
+                    individualPedido.FechaPedido = DateTime.Now;
+                    individualPedido.EstadoPedido = "Entrante";
+                    individualPedido.Envios = pedido.Envios;
+
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(urlAPI);
+                        var response = await client.PostAsJsonAsync("Pedido/Insert", individualPedido);
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            return BadRequest(new { success = false, message = $"Error al insertar el pedido con IdCompra {individualPedido.IdCompra}." });
+                        }
+                    }
                 }
+            }
+            else
+            {
+                return BadRequest(new { success = false, message = "No orders found in the request." });
             }
 
             return Ok(new { success = true });
@@ -255,43 +278,61 @@ namespace INNOTEC_Proyect.Controllers
         [Route("Envio/create_Preference")]
         public async Task<IActionResult> CreatePreference([FromBody] OrderData orderData)
         {
-            var accessToken = _configuration["MercadoPago:AccessToken"];
-            MercadoPagoConfig.AccessToken = accessToken;
-            // Crea el objeto de request de la preference
-            var request = new PreferenceRequest
+            try
             {
-                Items = new List<PreferenceItemRequest>
-                {
-                    new PreferenceItemRequest
-                    {
-                        Title = orderData.Title,
-                        Quantity = orderData.Quantity,
-                        CurrencyId = "MXN",
-                        UnitPrice = orderData.Price,
-                    },
-                },
-                BackUrls = new PreferenceBackUrlsRequest
-                {
-                    Success = "https://github.com/JavierAv1/WS-INNOTEC",
-                    Failure = "https://github.com/JavierAv1/WS-INNOTEC",
-                    Pending = "https://github.com/JavierAv1/WS-INNOTEC",
-                },
-                AutoReturn  = "approved"
-            };
+                var accessToken = _configuration["MercadoPago:AccessToken"];
+                MercadoPagoConfig.AccessToken = accessToken;
 
-            // Crea la preferencia usando el client
-            var client = new PreferenceClient();
-            Preference preference = await client.CreateAsync(request);
+                // Recuperar valores desde la sesión
+                Cantidad = HttpContext.Session.GetInt32("Cantidad") ?? 0;
+                Total = decimal.Parse(HttpContext.Session.GetString("Total"));
 
-            // Devuelve el preferenceId al cliente
-            return Ok(new { id = preference.Id });
+                decimal unitario = Total / Cantidad;
+
+                // Crea el objeto de request de la preference
+                var request = new PreferenceRequest
+                {
+                    Items = new List<PreferenceItemRequest>
+            {
+                new PreferenceItemRequest
+                {
+                    Title = orderData.Title,
+                    Quantity = Cantidad,
+                    CurrencyId = "MXN",
+                    UnitPrice = unitario,
+                },
+            }
+                };
+
+                var client = new PreferenceClient();
+                Preference preference = await client.CreateAsync(request);
+
+                bool isCreated = !string.IsNullOrEmpty(preference.Id);
+
+                if (isCreated)
+                {
+                    return Ok(new { success = true, id = preference.Id });
+                }
+                else
+                {
+                    return BadRequest(new { success = false, message = "Error al crear la preferencia de pago." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
         }
-    }
 
-    public class OrderData
-    {
-        public string Title { get; set; }
-        public int Quantity { get; set; }
-        public decimal Price { get; set; }
+
+
+
+
+        public class OrderData
+        {
+            public string Title { get; set; }
+            public int Quantity { get; set; }
+            public decimal Price { get; set; }
+        }
     }
 }

@@ -1,15 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using INNOTEC_Proyect.Clases;
+using Microsoft.AspNetCore.Mvc;
 using ML;
 using Newtonsoft.Json;
-using INNOTEC_Proyect.Clases;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System;
 using Newtonsoft.Json.Linq;
-using Microsoft.AspNetCore.Components.Web;
+using System.Net.Http.Headers;
 
 namespace INNOTEC_Proyect.Controllers
 {

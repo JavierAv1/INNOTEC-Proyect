@@ -30,6 +30,14 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.SlidingExpiration = true;
     });
 
+// Configuración de sesiones
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Tiempo de expiración de la sesión
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true; // Necesario para cumplir con las leyes de protección de datos como GDPR
+});
+
 var app = builder.Build();
 
 // Configurar middleware
@@ -45,6 +53,9 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Habilitar el uso de sesiones
+app.UseSession();
 
 app.MapControllerRoute(
     name: "default",

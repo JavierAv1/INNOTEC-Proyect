@@ -1,11 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using System.Net.Http;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using System.Threading.Tasks;
-using System;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using System.Security.Claims;
 
 namespace INNOTEC_Proyect.Controllers
 {
@@ -23,7 +20,7 @@ namespace INNOTEC_Proyect.Controllers
         [HttpGet]
         public IActionResult Login()
         {
-            return View(); 
+            return View();
         }
 
         [HttpPost]
@@ -101,7 +98,7 @@ namespace INNOTEC_Proyect.Controllers
             else
             {
                 ViewBag.Message = "Contraseña o UserName incorrecto ";
-                return View("Login"); 
+                return View("Login");
             }
         }
 
@@ -117,8 +114,8 @@ namespace INNOTEC_Proyect.Controllers
                     httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
                     string urlAPI = _configuration["UrlAPI"];
                     httpClient.BaseAddress = new Uri(urlAPI);
-                  
-                   
+
+
                     var jsonContent = JsonConvert.SerializeObject(new
                     {
                         //usuario.UsuarioId,
@@ -145,7 +142,7 @@ namespace INNOTEC_Proyect.Controllers
                         result.Success = JsonConvert.DeserializeObject<bool>(readContent);
                         if (result.Success)
                         {
-                            return RedirectToAction("Login"); 
+                            return RedirectToAction("Login");
                         }
                     }
                     else

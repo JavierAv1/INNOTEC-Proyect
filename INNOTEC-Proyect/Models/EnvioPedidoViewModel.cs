@@ -10,6 +10,6 @@ namespace INNOTEC_Proyect.Models
         public Pedido Pedido { get; set; }
 
         public List<Envio> Envios { get; set; }
-        public List<Pedido> Pedidos { get; set; } 
+        public List<Pedido> Pedidos { get; set; }
     }
 }

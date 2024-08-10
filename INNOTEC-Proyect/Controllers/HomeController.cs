@@ -3,10 +3,7 @@ using INNOTEC_Proyect.Models;
 using Microsoft.AspNetCore.Mvc;
 using ML;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Diagnostics;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace INNOTEC_Proyect.Controllers
 {
