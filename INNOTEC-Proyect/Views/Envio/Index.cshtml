@@ -27,7 +27,6 @@
                 <form id="envioPedidoForm">
                     @foreach (var item in Model.Envios)
                     {
-                        <!-- Hidden field to keep track of Envio Ids -->
                         <input type="hidden" name="envioIds" value="@item.IdCompra" />
                     }
                     <!-- Código Postal -->
@@ -60,11 +59,9 @@
                         <label>Número:</label>
                         <input type="text" id="Numero" name="Numero" required placeholder="Escribe el número de tu domicilio" onfocus="deselectSavedAddresses()">
                     </div>
-                    <!-- Button for Save Address -->
                     <div class="form-group">
                         <button id="saveAddressBtn" type="button" class="btn btn-info" onclick="saveAddress()">Guardar Dirección</button>
                     </div>
-                    <!-- Button for Enable Textboxes -->
                     <div class="form-group">
                         <button id="enableTextBoxesBtn" type="button" class="btn btn-secondary" onclick="enableTextBoxes()">Editar Dirección</button>
                     </div>
@@ -75,7 +72,6 @@
             <div id="savedAddresses">
                 <h3>Direcciones Guardadas</h3>
                 <ul id="addressList" class="list-group">
-                    <!-- Saved addresses will be loaded here -->
                 </ul>
                 <button id="paymentBtn" type="button" class="btn btn-warning">Realizar Pago</button>
                 <div id="wallet_container"></div>

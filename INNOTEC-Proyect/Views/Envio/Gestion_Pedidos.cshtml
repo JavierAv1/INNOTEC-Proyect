@@ -1,0 +1,104 @@
+﻿@model List<ML.Pedido>
+@{
+    ViewData["Title"] = "Gestión de Pedidos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Gestión de Pedidos</h2>
+
+<div class="container">
+    <div class="row">
+        <div class="col-4">
+            <input type="text" id="searchIdInput" class="form-control" placeholder="Filtrar por ID" value="@ViewBag.SearchId">
+        </div>
+        <div class="col-2">
+            <input type="button" id="searchPedidoBtn" value="Buscar" class="btn btn-primary">
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <table class="table table-responsive" id="tblPedidos">
+            <thead>
+                <tr>
+                    <th>Id Pedido</th>
+                    <th>Id Compra</th>
+                    <th>Fecha Pedido</th>
+                    <th>Estado Pedido</th>
+                    <th>Id Envio</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var pedido in Model)
+                {
+                    <tr>
+                        <td>@pedido.IdPedido</td>
+                        <td>@pedido.IdCompra</td>
+                        <td>@pedido.FechaPedido</td>
+                        <td>
+                            @Html.DropDownListFor(
+                                     m => pedido.EstadoPedido,
+                                     new SelectList(new List<SelectListItem>
+                        {
+                        new SelectListItem { Text = "Entrante", Value = "Entrante" },
+                        new SelectListItem { Text = "Pendiente", Value = "Pendiente" },
+                        new SelectListItem { Text = "Valido", Value = "Valido" },
+                        new SelectListItem { Text = "Rechazado", Value = "Rechazado" },
+                        }, "Value", "Text", pedido.EstadoPedido),
+                                     new { @class = "form-control status-select", data_pedido_id = pedido.IdPedido }
+                                     )
+                        </td>
+                        <td>@pedido.IdEnvio</td>
+                        <td class="text-center">
+                            <button class="btn btn-danger delete-pedido" data-pedido-id="@pedido.IdPedido">Eliminar</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            console.log("Document ready");
+
+            $('#tblPedidos').DataTable({
+                language: {
+                    url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json",
+                }
+            });
+
+            $('#searchPedidoBtn').click(function () {
+                console.log("Search button clicked");
+
+                var searchId = $('#searchIdInput').val().trim();
+
+                if (searchId) {
+                    $.ajax({
+                        url: '@Url.Action("GetById", "Pedido")',
+                        type: 'GET',
+                        data: { id: searchId },
+                        success: function (pedido) {
+                            if (pedido) {
+
+                                alert('Pedido encontrado: ' + JSON.stringify(pedido));
+                            } else {
+                                alert('Pedido no encontrado.');
+                            }
+                        },
+                        error: function () {
+                            alert('Error al obtener el pedido.');
+                        }
+                    });
+                } else {
+                    alert('Por favor ingrese un ID de pedido.');
+                }
+            });
+
+        });
+    </script>
+}

@@ -69,9 +69,6 @@ namespace INNOTEC_Proyect.Controllers
             return View(viewModel);
         }
 
-
-
-
         [HttpPost]
         public async Task<IActionResult> InsertEnvioPedido([FromBody] EnvioPedidoViewModel model)
         {
@@ -99,7 +96,7 @@ namespace INNOTEC_Proyect.Controllers
         }
 
         [HttpGet]
-        public async Task<List<Envio>> GetAllEnvios()
+        public async Task<IActionResult> GetAllEnvios(string searchId)
         {
             List<Envio> envios = new List<Envio>();
             string urlAPI = _configuration["UrlAPI"];
@@ -112,9 +109,18 @@ namespace INNOTEC_Proyect.Controllers
                     var resultString = await response.Content.ReadAsStringAsync();
                     envios = JsonConvert.DeserializeObject<List<Envio>>(resultString);
                 }
-                return envios;
+                else
+                {
+                    // Manejar el caso donde la respuesta no es exitosa
+                    return View("Error", new ErrorViewModel { RequestId = "Error al obtener los envíos" });
+                }
             }
+
+            ViewBag.SearchId = searchId;  // Pasar el valor de searchId a la vista
+            return View("Gestion_Envios", envios);
         }
+
+
 
         [HttpGet]
         public async Task<IActionResult> GetEnviosByUserId()
@@ -161,7 +167,7 @@ namespace INNOTEC_Proyect.Controllers
         [HttpPost]
         public async Task<IActionResult> InsertEnvio([FromBody] Envio envio)
         {
-            // Obtener el User ID de los claims
+       
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
 
             if (userIdClaim == null)
@@ -238,22 +244,24 @@ namespace INNOTEC_Proyect.Controllers
                 return BadRequest(new { success = false, message = "Invalid User ID." });
             }
 
-            // Recuperar valores desde la sesión
+
             Cantidad = HttpContext.Session.GetInt32("Cantidad") ?? 0;
             Total = decimal.Parse(HttpContext.Session.GetString("Total"));
             var pedidos = JsonConvert.DeserializeObject<List<Pedido>>(HttpContext.Session.GetString("Pedidos"));
 
-            // Ahora puedes usar los valores de Cantidad, Total, y la lista de Pedidos
-            string urlAPI = _configuration["UrlAPI"];
-
+            // Asignar valores necesarios
             if (pedidos != null && pedidos.Any())
             {
+
+                string urlAPI = _configuration["UrlAPI"]; // Asegúrate de que esta clave esté en tu appsettings.json
+
                 foreach (var individualPedido in pedidos)
                 {
                     individualPedido.UsuarioId = userId;
                     individualPedido.FechaPedido = DateTime.Now;
                     individualPedido.EstadoPedido = "Entrante";
-                    individualPedido.Envios = pedido.Envios;
+                    individualPedido.IdEnvio = pedido.IdEnvio;
+
 
                     using (var client = new HttpClient())
                     {
@@ -273,6 +281,7 @@ namespace INNOTEC_Proyect.Controllers
 
             return Ok(new { success = true });
         }
+
 
         [HttpPost]
         [Route("Envio/create_Preference")]
@@ -323,8 +332,79 @@ namespace INNOTEC_Proyect.Controllers
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
+        [HttpGet]
+        public async Task<IActionResult> GetAllPedidos()
+        {
+            List<Pedido> pedidos = new List<Pedido>();
+            string urlAPI = _configuration["UrlAPI"];
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(urlAPI);
+                var response = await client.GetAsync("Pedido/GetAll");
+                if (response.IsSuccessStatusCode)
+                {
+                    var resultString = await response.Content.ReadAsStringAsync();
+                    pedidos = JsonConvert.DeserializeObject<List<Pedido>>(resultString);
+                }
+                else
+                {
+                    return View("Error", new ErrorViewModel { RequestId = "Error al obtener los pedidos" });
+                }
+            }
 
+            return View("Gestion_Pedidos", pedidos);
+        }
 
+        [HttpGet("GetById")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            string urlAPI = _configuration["UrlAPI"];
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(urlAPI);
+                var response = await client.GetAsync($"Pedido/GetById?id={id}");
+                if (response.IsSuccessStatusCode)
+                {
+                    var resultString = await response.Content.ReadAsStringAsync();
+                    var pedido = JsonConvert.DeserializeObject<Pedido>(resultString);
+                    return Ok(pedido);
+                }
+                return BadRequest("Error al obtener el pedido.");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdatePedidoStatus(int id, string status)
+        {
+            string urlAPI = _configuration["UrlAPI"];
+            using (var client = new HttpClient())
+            {
+                var updateData = new { IdPedido = id, EstadoPedido = status };
+                client.BaseAddress = new Uri(urlAPI);
+                var response = await client.PutAsJsonAsync($"Pedido/UpdateStatus", updateData);
+                if (response.IsSuccessStatusCode)
+                {
+                    return Ok();
+                }
+                return BadRequest();
+            }
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeletePedido(int id)
+        {
+            string urlAPI = _configuration["UrlAPI"];
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(urlAPI);
+                var response = await client.DeleteAsync($"Pedido/Delete?id={id}");
+                if (response.IsSuccessStatusCode)
+                {
+                    return Ok();
+                }
+                return BadRequest();
+            }
+        }
 
 
 

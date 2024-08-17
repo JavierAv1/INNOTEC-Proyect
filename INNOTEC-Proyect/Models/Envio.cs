@@ -15,4 +15,6 @@ public partial class Envio
     public int? IdPedido { get; set; } // Llave foránea para Pedido
     public Pedido? Pedido { get; set; } // Propiedad de navegación para Pedido
     public virtual Compra? IdCompraNavigation { get; set; } // Propiedad de navegación para Compra
+
+    public List<Envio> Envios { get; set; }
 }
