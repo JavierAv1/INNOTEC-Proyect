@@ -2,24 +2,23 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configurar appsettings.json
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
-// Leer claves de configuración
+
 var mercadoPagoConfig = builder.Configuration.GetSection("MercadoPago");
 var publicKey = mercadoPagoConfig["PublicKey"];
 var accessToken = mercadoPagoConfig["AccessToken"];
 
-// Agregar servicios y configurar HttpClient
+
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddHttpClient("API", client =>
 {
-    client.BaseAddress = new Uri("http://localhost:5001/"); // URL de tu API
+    client.BaseAddress = new Uri("http://localhost:5001/"); 
     client.DefaultRequestHeaders.Add("Accept", "application/json");
 });
 
-// Configuración de autenticación basada en cookies
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -30,12 +29,12 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.SlidingExpiration = true;
     });
 
-// Configuración de sesiones
+
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30); // Tiempo de expiración de la sesión
+    options.IdleTimeout = TimeSpan.FromMinutes(30); 
     options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true; // Necesario para cumplir con las leyes de protección de datos como GDPR
+    options.Cookie.IsEssential = true; 
 });
 
 var app = builder.Build();
@@ -48,17 +47,20 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+app.UseStaticFiles(); 
+
 app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Habilitar el uso de sesiones
+
 app.UseSession();
+
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
 
 app.Run();

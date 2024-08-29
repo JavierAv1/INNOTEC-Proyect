@@ -1,10 +1,10 @@
 ﻿.gradient-custom-2 {
-	/* fallback for old browsers */
 	background: #fccb90;
-	/* Chrome 10-25, Safari 5.1-6 */
+
 	background: -webkit-linear-gradient(to right, #ee7724, #d8363a, #dd3675, #b44593);
-	/* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
 	background: linear-gradient(to right, #ee7724, #d8363a, #dd3675, #b44593);
+	color: white;
 }
 
 @media (min-width: 768px) {
@@ -19,3 +19,68 @@
 		border-bottom-right-radius: .3rem;
 	}
 }
+
+.form-outline {
+	margin-bottom: 1.5rem;
+}
+
+	.form-outline input {
+		border: 1px solid #ced4da;
+		padding: 0.75rem;
+		font-size: 1rem;
+		border-radius: 0.25rem;
+	}
+
+		.form-outline input:focus {
+			border-color: #d8363a;
+			box-shadow: 0 0 0 0.2rem rgba(216, 54, 58, 0.25);
+		}
+
+.form-label {
+	margin-bottom: 0.5rem;
+	font-weight: 600;
+}
+
+.btn-primary {
+	background-color: #d8363a;
+	border-color: #d8363a;
+}
+
+	.btn-primary:hover {
+		background-color: #b44593;
+		border-color: #b44593;
+	}
+
+.btn-outline-danger {
+	color: #d8363a;
+	border-color: #d8363a;
+}
+
+	.btn-outline-danger:hover {
+		background-color: #d8363a;
+		color: #fff;
+	}
+
+#loginForm {
+	max-width: 100%;
+}
+
+#formTitle {
+	font-size: 1.5rem;
+	font-weight: bold;
+	margin-bottom: 2rem;
+}
+
+.text-center.pt-1.mb-5.pb-1 {
+	margin-bottom: 1.5rem !important;
+}
+
+#extraFields {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+}
+
+	#extraFields .col-md-6 {
+		flex: 0 0 calc(50% - 1rem);
+	}

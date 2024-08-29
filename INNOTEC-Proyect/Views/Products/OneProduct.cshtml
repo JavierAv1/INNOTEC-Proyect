@@ -72,10 +72,10 @@
                 }
             </ul>
             <div class="search-container">
-                <form class="d-flex" method="get" asp-controller="Home" asp-action="GetByName">
+                <form class="d-flex" method="get" asp-controller="Home" asp-action="GetByName" id="searchForm">
                     <input class="form-control me-2 search-input" type="search" name="search" placeholder="Search" aria-label="Search" autocomplete="off">
-                    <div class="search-results" style="display: none;"></div>
                 </form>
+                <div class="search-results" style="display: none;"></div>
             </div>
         </div>
     </div>

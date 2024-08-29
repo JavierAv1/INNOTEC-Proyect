@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using ML;
 using Newtonsoft.Json;
 using System.Security.Claims;
 
@@ -168,6 +169,29 @@ namespace INNOTEC_Proyect.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Index", "Home");
         }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateUsuarioByUserName(string userName, string password)
+        {
+            using (HttpClient httpClient = new HttpClient())
+            {
+                httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                string urlAPI = _configuration["UrlAPI"];
+                httpClient.BaseAddress = new Uri(urlAPI);
+
+                // Construimos la URL con los parámetros userName y password
+                var response = await httpClient.PutAsync($"Usuario/UpdateByUserName?userName={Uri.EscapeDataString(userName)}&password={Uri.EscapeDataString(password)}", null);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return Json(new { success = true });
+                }
+                return Json(new { success = false });
+            }
+        }
+
+
+
     }
 }
 

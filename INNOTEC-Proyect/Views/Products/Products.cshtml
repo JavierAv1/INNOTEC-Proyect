@@ -10,7 +10,6 @@
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">CATALOGO</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -25,8 +24,8 @@
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink@dept.IdDepartamento">
                             @if (dept.Productos.Any())
                             {
-                                <li class="dropdown-submenu">
-                                    <a class="dropdown-item dropdown-toggle" href="#">Productos del Departamento</a>
+                                <li>
+                                    <a class="dropdown-item" href="#">Productos del Departamento</a>
                                     <ul class="dropdown-menu">
                                         @foreach (var prod in dept.Productos)
                                         {
@@ -42,8 +41,8 @@
                                     <ul class="dropdown-menu">
                                         @if (cat.Productos.Any())
                                         {
-                                            <li class="dropdown-submenu">
-                                                <a class="dropdown-item dropdown-toggle" href="#">Productos de la Categoría</a>
+                                            <li>
+                                                <a class="dropdown-item" href="#">Productos de la Categoría</a>
                                                 <ul class="dropdown-menu">
                                                     @foreach (var prod in cat.Productos)
                                                     {
@@ -71,15 +70,16 @@
                     </li>
                 }
             </ul>
-            <div class="search-container position-relative">
-                <form class="d-flex" method="get" asp-controller="Home" asp-action="GetByName">
+            <div class="search-container">
+                <form class="d-flex" method="get" asp-controller="Home" asp-action="GetByName" id="searchForm">
                     <input class="form-control me-2 search-input" type="search" name="search" placeholder="Search" aria-label="Search" autocomplete="off">
-                    <div class="search-results dropdown-menu" style="display: none;"></div>
                 </form>
+                <div class="search-results" style="display: none;"></div>
             </div>
         </div>
     </div>
 </nav>
+
 
 @if (Model.Productos != null && Model.Productos.Count > 0)
 {
@@ -139,10 +139,36 @@
             Producto agregado correctamente.
         </div>
     </div>
+
+    <!-- Nuevo toast para la autenticación -->
+    <div id="authToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="5000">
+        <div class="toast-header">
+            <img src="~/Images/shop.svg" class="rounded me-2" alt="...">
+            <strong class="me-auto">Atención</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            <!-- El mensaje se actualizará dinámicamente desde JavaScript -->
+        </div>
+    </div>
 </div>
 
 <script>
     function addCarrito(idProducto) {
+        // Verificar si el usuario está autenticado
+        var isAuthenticated = '@User.Identity.IsAuthenticated' === 'True';
+
+        if (!isAuthenticated) {
+            // Mostrar un toast si el usuario no está autenticado
+            var toastElement = document.getElementById('authToast');
+            var toastBody = toastElement.querySelector('.toast-body');
+            toastBody.textContent = 'Favor de iniciar sesión para agregar productos al carrito.';
+            var authToast = new bootstrap.Toast(toastElement);
+            authToast.show();
+            return;
+        }
+
+        // Si el usuario está autenticado, continuar con la solicitud AJAX
         $.post('@Url.Action("AddCarrito", "Carrito")', { idProducto: idProducto })
             .done(function (response) {
                 var toast = new bootstrap.Toast(document.getElementById('productToast'));
@@ -153,4 +179,3 @@
             });
     }
 </script>
-

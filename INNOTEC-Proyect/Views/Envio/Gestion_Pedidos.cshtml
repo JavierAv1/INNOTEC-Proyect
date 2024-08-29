@@ -8,17 +8,6 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-4">
-            <input type="text" id="searchIdInput" class="form-control" placeholder="Filtrar por ID" value="@ViewBag.SearchId">
-        </div>
-        <div class="col-2">
-            <input type="button" id="searchPedidoBtn" value="Buscar" class="btn btn-primary">
-        </div>
-    </div>
-
-    <hr />
-
-    <div class="row">
         <table class="table table-responsive" id="tblPedidos">
             <thead>
                 <tr>
@@ -27,6 +16,7 @@
                     <th>Fecha Pedido</th>
                     <th>Estado Pedido</th>
                     <th>Id Envio</th>
+                    <th>Id Usuario</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -51,7 +41,9 @@
                                      )
                         </td>
                         <td>@pedido.IdEnvio</td>
+                        <td>@pedido.UsuarioId</td>
                         <td class="text-center">
+                            <button class="btn btn-success update-pedido" data-pedido-id="@pedido.IdPedido">Actualizar</button>
                             <button class="btn btn-danger delete-pedido" data-pedido-id="@pedido.IdPedido">Eliminar</button>
                         </td>
                     </tr>
@@ -62,35 +54,48 @@
 </div>
 
 @section Scripts {
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css" />
+
+    <!-- DataTables JS -->
+    <script type="text/javascript" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+
     <script>
+        console.log("Script is running");
+
         $(document).ready(function () {
             console.log("Document ready");
 
+            // Inicializar DataTable
             $('#tblPedidos').DataTable({
                 language: {
                     url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json",
                 }
             });
 
+            // Evento de clic para el botón de búsqueda
             $('#searchPedidoBtn').click(function () {
-                console.log("Search button clicked");
-
                 var searchId = $('#searchIdInput').val().trim();
+                console.log("Search button clicked with ID:", searchId);
 
                 if (searchId) {
                     $.ajax({
-                        url: '@Url.Action("GetById", "Pedido")',
+                        url: '@Url.Action("GetById", "Envio")',
                         type: 'GET',
                         data: { id: searchId },
                         success: function (pedido) {
+                            console.log("Pedido encontrado:", pedido);
                             if (pedido) {
-
                                 alert('Pedido encontrado: ' + JSON.stringify(pedido));
                             } else {
                                 alert('Pedido no encontrado.');
                             }
                         },
                         error: function () {
+                            console.log("Error al obtener el pedido.");
                             alert('Error al obtener el pedido.');
                         }
                     });
@@ -99,6 +104,80 @@
                 }
             });
 
+            $(document).on('click', '.update-pedido', function () {
+                var row = $(this).closest('tr');
+                var pedidoId = $(this).data('pedido-id');
+                var idCompra = row.find('td').eq(1).text().trim();
+                var fechaPedido = row.find('td').eq(2).text().trim();
+                var status = row.find('.status-select').val();
+                var idEnvio = row.find('td').eq(4).text().trim();
+                var usuarioId = row.find('td').eq(5).text().trim();
+
+                // Validar y formatear la fecha
+                var fechaPedidoFormatted = null;
+                if (fechaPedido) {
+                    var dateParts = fechaPedido.split(' '); // Assuming the date format includes a time part
+                    var dateOnly = dateParts[0].split('/'); // Assuming date format is DD/MM/YYYY
+                    var formattedDate = `${dateOnly[2]}-${dateOnly[1]}-${dateOnly[0]}T00:00:00Z`; // Convert to YYYY-MM-DDTHH:MM:SSZ format
+
+                    var dateObj = new Date(formattedDate);
+                    if (!isNaN(dateObj.getTime())) {
+                        fechaPedidoFormatted = dateObj.toISOString();
+                    } else {
+                        console.error("Invalid date format for FechaPedido:", fechaPedido);
+                    }
+                }
+
+                var data = {
+                    IdPedido: pedidoId ? parseInt(pedidoId) : null,
+                    IdCompra: idCompra ? parseInt(idCompra) : null,
+                    FechaPedido: fechaPedidoFormatted,
+                    EstadoPedido: status || null,
+                    IdEnvio: idEnvio ? parseInt(idEnvio) : null,
+                    UsuarioId: usuarioId ? parseInt(usuarioId) : null
+                };
+
+                console.log("Datos a enviar:", data);  // Revisa los datos antes de enviarlos
+
+                $.ajax({
+                    url: '@Url.Action("UpdatePedido", "Envio")',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function (response) {
+                        alert('Estado del pedido actualizado.');
+                    },
+                    error: function () {
+                        alert('Error al actualizar el estado del pedido.');
+                    }
+                });
+            });
+
+
+
+            // Evento de clic para el botón de eliminar
+            $(document).on('click', '.delete-pedido', function () {
+                var pedidoId = $(this).data('pedido-id');
+                console.log("Delete button clicked for Pedido ID:", pedidoId);
+
+                if (confirm('¿Estás seguro de que deseas eliminar este pedido?')) {
+                    $.ajax({
+                        url: '@Url.Action("DeletePedido", "Envio")',
+                        type: 'DELETE',
+                        data: { id: pedidoId },
+                        success: function (response) {
+                            console.log("Pedido eliminado con éxito.");
+                            alert('Pedido eliminado.');
+                            // Remover la fila de la tabla
+                            $(this).closest('tr').remove();
+                        },
+                        error: function () {
+                            console.log("Error al eliminar el pedido.");
+                            alert('Error al eliminar el pedido.');
+                        }
+                    });
+                }
+            });
         });
     </script>
 }

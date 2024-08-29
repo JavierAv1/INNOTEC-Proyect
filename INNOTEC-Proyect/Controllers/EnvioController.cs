@@ -374,19 +374,25 @@ namespace INNOTEC_Proyect.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdatePedidoStatus(int id, string status)
+        public async Task<IActionResult> UpdatePedido([FromBody] Pedido pedido)
         {
+            if (pedido == null)
+            {
+                return BadRequest("Datos del pedido no válidos.");
+            }
+
             string urlAPI = _configuration["UrlAPI"];
             using (var client = new HttpClient())
             {
-                var updateData = new { IdPedido = id, EstadoPedido = status };
                 client.BaseAddress = new Uri(urlAPI);
-                var response = await client.PutAsJsonAsync($"Pedido/UpdateStatus", updateData);
+
+                var response = await client.PutAsJsonAsync($"Pedido/Update", pedido);
+
                 if (response.IsSuccessStatusCode)
                 {
-                    return Ok();
+                    return Ok("Pedido actualizado con éxito.");
                 }
-                return BadRequest();
+                return BadRequest("Error al actualizar el pedido.");
             }
         }
 
@@ -410,9 +416,7 @@ namespace INNOTEC_Proyect.Controllers
 
         public class OrderData
         {
-            public string Title { get; set; }
-            public int Quantity { get; set; }
-            public decimal Price { get; set; }
+            public string? Title { get; set; }
         }
     }
 }

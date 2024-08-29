@@ -14,9 +14,9 @@
                             <div class="card-body p-md-5 mx-md-4">
 
                                 <div class="text-center">
-                                    <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/lotus.webp"
+                                    <img src="~/Images//logo.jpg"
                                          style="width: 185px;" alt="logo">
-                                    <h4 class="mt-1 mb-5 pb-1">We are The Lotus Team</h4>
+                              @*       <h4 class="mt-1 mb-5 pb-1">We are The Lotus Team</h4> *@
                                 </div>
 
                                 @if (ViewBag.Message != null)
@@ -94,11 +94,10 @@
                         </div>
                         <div class="col-lg-6 d-flex align-items-center gradient-custom-2">
                             <div class="text-white px-3 py-4 p-md-5 mx-md-4">
-                                <h4 class="mb-4">We are more than just a company</h4>
+                                <h4 class="mb-4">Bienvenido a Proveedora Diesel Cuatro Caminos</h4>
                                 <p class="small mb-0">
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                                    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                                    exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                 En Prodisa, nos dedicamos a brindarte las mejores refacciones para vehículos pesados, acompañadas de un servicio excepcional.
+                                    Nuestro objetivo es asegurar que encuentres todo lo que tu vehículo necesita con la calidad y confianza que mereces.
                                 </p>
                             </div>
                         </div>
@@ -108,48 +107,31 @@
         </div>
     </div>
 </section>
+<!-- Modal para restablecer contraseña -->
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="forgotPasswordModalLabel">Restablecer Contraseña</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="forgotPasswordForm">
+                    <div class="mb-3">
+                        <label for="forgotUsuarioId" class="form-label">Nombre de Usuario</label>
+                        <input type="text" class="form-control" id="forgotUsuarioId" name="UserName" placeholder="Ingrese su nombre de usuario">
+                    </div>
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label">Nueva Contraseña</label>
+                        <input type="password" class="form-control" id="newPassword" name="Contraseña" placeholder="Ingrese la nueva contraseña">
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="updatePassword()">Actualizar Contraseña</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const loginForm = document.getElementById('loginForm');
-        const submitButton = document.getElementById('submitButton');
-        const toggleButton = document.getElementById('toggleButton');
-        const userNameOrEmailDiv = document.getElementById('userNameOrEmailDiv');
-        const extraFields = document.getElementById('extraFields');
-        const passwordDiv = document.getElementById('passwordDiv');
-
-        toggleButton.addEventListener('click', function () {
-            const isLogin = submitButton.textContent === 'Log in';
-            document.getElementById('formTitle').textContent = isLogin ? 'Please create a new account' : 'Please login to your account';
-            submitButton.textContent = isLogin ? 'Register' : 'Log in';
-            document.getElementById('toggleText').textContent = isLogin ? 'Already have an account?' : "Don't have an account?";
-            toggleButton.textContent = isLogin ? 'Login' : 'Create new';
-
-            userNameOrEmailDiv.style.display = isLogin ? 'none' : 'block';
-            passwordDiv.style.display = 'block';
-            extraFields.style.display = isLogin ? 'block' : 'none';
-
-            document.getElementById('userNameOrEmail').disabled = !isLogin;
-            document.getElementById('userNameOrEmail').required = !isLogin;
-            document.getElementById('userName').required = isLogin;
-            document.getElementById('email').required = isLogin;
-            document.getElementById('firstName').required = isLogin;
-            document.getElementById('lastName').required = isLogin;
-            document.getElementById('dob').required = isLogin;
-            document.getElementById('gender').required = isLogin;
-
-            loginForm.action = isLogin ? '/Login/Register' : '/Login/Login';
-        });
-
-        loginForm.addEventListener('submit', function () {
-            submitButton.disabled = true;
-        });
-
-        loginForm.addEventListener('keypress', function (event) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                submitButton.click();
-            }
-        });
-    });
-</script>
+@section Scripts {
+    <script src="~/js/Login.js"></script>
+}
